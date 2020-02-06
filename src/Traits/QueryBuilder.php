@@ -2,7 +2,10 @@
 
 namespace glodzienski\AWSElasticsearchService\Traits;
 
-use glodzienski\AWSElasticsearchService\Facades\ElasticSearch;
+use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
+use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchValueCountAggregation;
+use glodzienski\AWSElasticsearchService\ElasticSearchAggregationResponseHandler;
+use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 
@@ -40,6 +43,11 @@ trait QueryBuilder
             ->getContents();
 
         return json_decode($indexes, true);
+    }
+
+    public function newQuery()
+    {
+        return $this;
     }
 
     public function where($field, $value)
@@ -308,7 +316,7 @@ trait QueryBuilder
         }
 
         $params = $this->buildParameters();
-        $response = app('elasticsearch')::search(null, $params['body'], null, $this->getType(), $this->getIndex());
+        $response = app('elasticsearch')->search(null, $params['body'], null, $this->getType(), $this->getIndex());
 
         if ($this->getFrom() > 10000 || $this->getSize() > 10000) { //10000 é o limite padrão
             $this->setMaxRowsCanBeSearch(10000);
