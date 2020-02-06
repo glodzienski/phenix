@@ -22,7 +22,7 @@ trait QueryBuilder
 
     public static function index(string $index)
     {
-        $instance = new self();
+        $instance = new self();;
         if (method_exists($instance, 'validateIndex')) {
             $instance::validateIndex($index);
         }
