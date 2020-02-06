@@ -22,7 +22,7 @@ trait QueryBuilder
 
     public static function index(string $index)
     {
-        $instance = new self();;
+        $instance = (new static)->newQuery();
         if (method_exists($instance, 'validateIndex')) {
             $instance::validateIndex($index);
         }
@@ -308,7 +308,7 @@ trait QueryBuilder
         }
 
         $params = $this->buildParameters();
-        $response = ElasticSearch::search(null, $params['body'], null, $this->getType(), $this->getIndex());
+        $response = app('elasticsearch')::search(null, $params['body'], null, $this->getType(), $this->getIndex());
 
         if ($this->getFrom() > 10000 || $this->getSize() > 10000) { //10000 é o limite padrão
             $this->setMaxRowsCanBeSearch(10000);
