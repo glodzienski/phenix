@@ -1,6 +1,6 @@
 <?php
 
-namespace elegisandi\AWSElasticsearchService;
+namespace glodzienski\AWSElasticsearchService;
 
 use Illuminate\Foundation\Application as LaravelApplication;
 use Laravel\Lumen\Application as LumenApplication;
@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 
 /**
  * Class ElasticSearchServiceProvider
- * @package elegisandi\AWSElasticsearchService
+ * @package glodzienski\AWSElasticsearchService
  */
 class ElasticSearchServiceProvider extends ServiceProvider
 {
@@ -29,8 +29,8 @@ class ElasticSearchServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \elegisandi\AWSElasticsearchService\Commands\CreateIndex::class,
-                \elegisandi\AWSElasticsearchService\Commands\UpdateIndexMapping::class,
+                \glodzienski\AWSElasticsearchService\Commands\CreateIndex::class,
+                \glodzienski\AWSElasticsearchService\Commands\UpdateIndexMapping::class,
             ]);
         }
 
@@ -48,7 +48,7 @@ class ElasticSearchServiceProvider extends ServiceProvider
             return new ElasticSearch;
         });
 
-        $this->app->alias('elasticsearch', 'elegisandi\AWSElasticsearchService\ElasticSearch');
+        $this->app->alias('elasticsearch', 'glodzienski\AWSElasticsearchService\ElasticSearch');
     }
 
     /**
@@ -58,6 +58,6 @@ class ElasticSearchServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['elasticsearch', 'elegisandi\AWSElasticsearchService\ElasticSearch'];
+        return ['elasticsearch', 'glodzienski\AWSElasticsearchService\ElasticSearch'];
     }
 }

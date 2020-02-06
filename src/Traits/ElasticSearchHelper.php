@@ -1,6 +1,6 @@
 <?php
 
-namespace elegisandi\AWSElasticsearchService\Traits;
+namespace glodzienski\AWSElasticsearchService\Traits;
 
 use Exception;
 use Carbon\Carbon;
@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Trait ElasticSearchHelper
- * @package elegisandi\AWSElasticsearchService\Traits
+ * @package glodzienski\AWSElasticsearchService\Traits
  */
 trait ElasticSearchHelper
 {

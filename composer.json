@@ -1,8 +1,8 @@
 {
-    "name": "elegisandi/aws-elasticsearch-laravel",
+    "name": "glodzienski/phenix",
     "description": "AWS Elasticsearch Service for Laravel/Lumen",
-    "keywords": ["elegisandi", "aws", "elasticsearch", "laravel", "aws-elasticsearch-laravel"],
-    "homepage": "https://github.com/elegisandi/aws-elasticsearch-laravel", 
+    "keywords": ["glodzienski", "aws", "elasticsearch", "laravel", "aws-elasticsearch-laravel"],
+    "homepage": "https://github.com/glodzienski/phenix",
     "type": "library",
     "require": {
         "php": ">=7.0",
@@ -13,24 +13,24 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Elegi Sandi",
-            "email": "elegisandi@gmail.com",
+            "name": "Crystopher Glodzienski Cardoso",
+            "email": "crystopher.glodzienski@gmail.com",
             "role": "Developer"
         }
     ],
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "elegisandi\\AWSElasticsearchService\\": "src"
+            "glodzienski\\AWSElasticsearchService\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "elegisandi\\AWSElasticsearchService\\ElasticSearchServiceProvider"
+                "glodzienski\\AWSElasticsearchService\\ElasticSearchServiceProvider"
             ],
             "aliases": {
-                "ElasticSearch": "elegisandi\\AWSElasticsearchService\\ElasticSearchFacade"
+                "ElasticSearch": "glodzienski\\AWSElasticsearchService\\ElasticSearchFacade"
             }
         }
     }

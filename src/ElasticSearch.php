@@ -1,13 +1,13 @@
 <?php
 
-namespace elegisandi\AWSElasticsearchService;
+namespace glodzienski\AWSElasticsearchService;
 
 use Elasticsearch\Client;
-use elegisandi\AWSElasticsearchService\Traits\ElasticSearchHelper;
+use glodzienski\AWSElasticsearchService\Traits\ElasticSearchHelper;
 
 /**
  * Class ElasticSearch
- * @package elegisandi\AWSElasticsearchService
+ * @package glodzienski\AWSElasticsearchService
  */
 class ElasticSearch
 {

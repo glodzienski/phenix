@@ -2,20 +2,21 @@
 AWS Elasticsearch Service for Laravel/Lumen
 
 **NOTE:** This package only caters search, aggregation, and indexing transactions. Other than that, you can refer to [elasticsearch's official documentation](https://www.elastic.co/guide/en/elasticsearch/client/php-api/index.html).
+**NOTE:** This package is based on elegisandi/aws-elasticsearch-laravel
 
 ## Installation
 
-    composer require elegisandi/aws-elasticsearch-laravel
+    composer require glodzienski/aws-elasticsearch-laravel
 
 ## Laravel/Lumen Integration
 
 - Add service provider to your `config/app.php` providers
 
-      elegisandi\AWSElasticsearchService\ElasticSearchServiceProvider::class
+      glodzienski\AWSElasticsearchService\ElasticSearchServiceProvider::class
 
 - Add facade to your `config/app.php` aliases
 
-      'ElasticSearch' => elegisandi\AWSElasticsearchService\Facades\ElasticSearch::class
+      'ElasticSearch' => glodzienski\AWSElasticsearchService\Facades\ElasticSearch::class
       
 - Set AWS credentials and Elasticsearch config in your `.env` file
 
@@ -37,13 +38,13 @@ AWS Elasticsearch Service for Laravel/Lumen
         
 **If you want to configure elasticsearch mappings, settings and/or default type and index, just run:**
 
-    php artisan vendor:publish --provider=elegisandi\\AWSElasticsearchService\\ElasticSearchServiceProvider
+    php artisan vendor:publish --provider=glodzienski\\AWSElasticsearchService\\ElasticSearchServiceProvider
 
 **For Lumen:**
 
 - Register service provider to your `bootstrap/app.php`
 
-      $app->register(elegisandi\AWSElasticsearchService\ElasticSearchServiceProvider::class);      
+      $app->register(glodzienski\AWSElasticsearchService\ElasticSearchServiceProvider::class);      
 
 ## Basic Usage
     
@@ -135,7 +136,7 @@ AWS Elasticsearch Service for Laravel/Lumen
 
     > **$request** : an instance of `\Illuminate\Http\Request`, query variables in used:
 
-    - `range`, see [getDateRange](https://github.com/elegisandi/aws-elasticsearch-laravel#getDateRange-range-format-null) method
+    - `range`, see [getDateRange](https://github.com/glodzienski/phenix#getDateRange-range-format-null) method
     - `start`, a valid date string
     - `end`, a valid date string
     - `sort`, a mapping property
@@ -253,4 +254,4 @@ Open an issue first to discuss potential changes/additions.
 
 ## License
 
-[MIT](https://github.com/elegisandi/aws-elastic-search-laravel/blob/master/LICENSE)
+[MIT](https://github.com/glodzienski/phenix/blob/master/LICENSE)

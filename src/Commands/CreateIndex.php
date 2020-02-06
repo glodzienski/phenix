@@ -1,16 +1,16 @@
 <?php
 
-namespace elegisandi\AWSElasticsearchService\Commands;
+namespace glodzienski\AWSElasticsearchService\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Laravel\Lumen\Application as LumenApplication;
-use elegisandi\AWSElasticsearchService\Facades\ElasticSearch;
+use glodzienski\AWSElasticsearchService\Facades\ElasticSearch;
 use Exception;
 
 /**
  * Class CreateIndex
- * @package elegisandi\AWSElasticsearchService\Commands
+ * @package glodzienski\AWSElasticsearchService\Commands
  */
 class CreateIndex extends Command
 {

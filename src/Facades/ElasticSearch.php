@@ -1,6 +1,6 @@
 <?php
 
-namespace elegisandi\AWSElasticsearchService\Facades;
+namespace glodzienski\AWSElasticsearchService\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Http\Request;
@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Class ElasticSearch
- * @package elegisandi\AWSElasticsearchService\Facades
+ * @package glodzienski\AWSElasticsearchService\Facades
  *
  * @method static array aggregations(array $aggs, array $query = [], array $options = [], $type = null, $index = null)
  * @method static array search(array $query = [], array $options = [], array $range = [], $type = null, $index = null)
