@@ -226,7 +226,7 @@ trait QueryBuilder
         return $this;
     }
 
-    public function wherePrefix($field, array $value)
+    public function wherePrefix($field, string $value)
     {
         $this->wheres['must'][] = [
             'prefix' => [
@@ -263,7 +263,7 @@ trait QueryBuilder
         return $this;
     }
 
-    public function orWherePrefix($field, array $value)
+    public function orWherePrefix($field, string $value)
     {
         $this->wheres['should'][] = [
             'prefix' => [
