@@ -50,20 +50,6 @@ trait QueryBuilder
         return $this;
     }
 
-    public function where($field, $value)
-    {
-        $args = func_get_args();
-        if (count($args) == 3) {
-            list($field, $operator, $value) = $args;
-        } else {
-            $operator = '=';
-        }
-
-        self::applyCommonWhere('must', $field, $operator, $value);
-
-        return $this;
-    }
-
     private function applyCommonWhere($groupRequest, $field, $operator, $value): void
     {
         switch ($operator) {
@@ -128,9 +114,34 @@ trait QueryBuilder
         }
     }
 
+    public function where($field, $value)
+    {
+        $args = func_get_args();
+        if (count($args) == 3) {
+            list($field, $operator, $value) = $args;
+        } else {
+            $operator = '=';
+        }
+
+        self::applyCommonWhere('must', $field, $operator, $value);
+
+        return $this;
+    }
+
     public function whereIn($field, array $value)
     {
         $this->wheres['must'][] = [
+            'terms' => [
+                $field => $value
+            ]
+        ];
+
+        return $this;
+    }
+
+    public function whereNotIn($field, array $value)
+    {
+        $this->wheres['must_not'][] = [
             'terms' => [
                 $field => $value
             ]
@@ -145,29 +156,6 @@ trait QueryBuilder
             'multi_match' => [
                 'query' => $value,
                 'fields' => $fields
-            ]
-        ];
-
-        return $this;
-    }
-
-    public function orWhereMultiMatch(array $fields, string $value)
-    {
-        $this->wheres['should'][] = [
-            'multi_match' => [
-                'query' => $value,
-                'fields' => $fields
-            ]
-        ];
-
-        return $this;
-    }
-
-    public function whereNotIn($field, array $value)
-    {
-        $this->wheres['must_not'][] = [
-            'terms' => [
-                $field => $value
             ]
         ];
 
@@ -200,21 +188,6 @@ trait QueryBuilder
         ];
 
         return $this;
-    }
-
-    public function getWheres(): array
-    {
-        return $this->wheres;
-    }
-
-    public function getAggregations(): array
-    {
-        return $this->aggregations;
-    }
-
-    public function getOrdination()
-    {
-        return $this->ordination;
     }
 
     public function whereExists($field)
@@ -253,6 +226,17 @@ trait QueryBuilder
         return $this;
     }
 
+    public function wherePrefix($field, array $value)
+    {
+        $this->wheres['must'][] = [
+            'prefix' => [
+                $field => $value
+            ]
+        ];
+
+        return $this;
+    }
+
     public function orWhere($field, $value)
     {
         $args = func_get_args();
@@ -265,6 +249,44 @@ trait QueryBuilder
         self::applyCommonWhere('should', $field, $operator, $value);
 
         return $this;
+    }
+
+    public function orWhereMultiMatch(array $fields, string $value)
+    {
+        $this->wheres['should'][] = [
+            'multi_match' => [
+                'query' => $value,
+                'fields' => $fields
+            ]
+        ];
+
+        return $this;
+    }
+
+    public function orWherePrefix($field, array $value)
+    {
+        $this->wheres['should'][] = [
+            'prefix' => [
+                $field => $value
+            ]
+        ];
+
+        return $this;
+    }
+
+    public function getWheres(): array
+    {
+        return $this->wheres;
+    }
+
+    public function getAggregations(): array
+    {
+        return $this->aggregations;
+    }
+
+    public function getOrdination()
+    {
+        return $this->ordination;
     }
 
     public function orderBy($field, $direction = 'asc')
