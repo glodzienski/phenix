@@ -16,6 +16,7 @@ trait QueryBuilder
         'must_not' => [],
         'should' => [],
     ];
+    private $columns = [];
     private $aggregations = [];
     private $index;
     private $type = 'doc';
@@ -357,6 +358,11 @@ trait QueryBuilder
         return $this->size ?? 10;
     }
 
+    public function getColumns(): array
+    {
+        return $this->columns;
+    }
+
     private function setMaxRowsCanBeSearch(int $maxResult = null): void
     {
         $client = new Client();
@@ -401,6 +407,9 @@ trait QueryBuilder
         }
         if (isset($this->from)) {
             $params['body']['from'] = $this->getFrom();
+        }
+        if (!empty($this->columns)) {
+            $params['body']['_source'] = $this->getColumns();
         }
 
         return $params;
@@ -507,5 +516,12 @@ trait QueryBuilder
         $params = $this->buildParameters();
 
         return $params['body'];
+    }
+
+    public function select(array $columns)
+    {
+        $this->columns = $columns;
+
+        return $this;
     }
 }
