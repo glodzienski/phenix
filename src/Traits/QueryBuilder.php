@@ -9,21 +9,53 @@ use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 
+/**
+ * Trait QueryBuilder
+ * @package glodzienski\AWSElasticsearchService\Traits
+ */
 trait QueryBuilder
 {
+    /**
+     * @var array
+     */
     private $wheres = [
         'must' => [],
         'must_not' => [],
         'should' => [],
     ];
+    /**
+     * @var array
+     */
     private $columns = [];
+    /**
+     * @var array
+     */
     private $aggregations = [];
+    /**
+     * @var
+     */
     private $index;
+    /**
+     * @var string
+     */
     private $type = 'doc';
+    /**
+     * @var
+     */
     private $ordination;
+    /**
+     * @var
+     */
     private $from;
+    /**
+     * @var
+     */
     private $size;
 
+    /**
+     * @param string $index
+     * @return QueryBuilder
+     */
     public static function index(string $index)
     {
         $instance = (new static)->newQuery();
@@ -35,6 +67,9 @@ trait QueryBuilder
         return $instance;
     }
 
+    /**
+     * @return mixed
+     */
     public static function getAvailableIndexes()
     {
         $client = new Client();
@@ -46,11 +81,20 @@ trait QueryBuilder
         return json_decode($indexes, true);
     }
 
+    /**
+     * @return $this
+     */
     public function newQuery()
     {
         return $this;
     }
 
+    /**
+     * @param $groupRequest
+     * @param $field
+     * @param $operator
+     * @param $value
+     */
     private function applyCommonWhere($groupRequest, $field, $operator, $value): void
     {
         switch ($operator) {
@@ -115,6 +159,11 @@ trait QueryBuilder
         }
     }
 
+    /**
+     * @param $field
+     * @param $value
+     * @return $this
+     */
     public function where($field, $value)
     {
         $args = func_get_args();
@@ -129,6 +178,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param array $value
+     * @return $this
+     */
     public function whereIn($field, array $value)
     {
         $this->wheres['must'][] = [
@@ -140,6 +194,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param array $value
+     * @return $this
+     */
     public function whereNotIn($field, array $value)
     {
         $this->wheres['must_not'][] = [
@@ -151,6 +210,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param array $fields
+     * @param string $value
+     * @return $this
+     */
     public function whereMultiMatch(array $fields, string $value)
     {
         $this->wheres['must'][] = [
@@ -163,6 +227,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param array $value
+     * @return $this
+     */
     public function whereBetween($field, array $value)
     {
         $this->wheres['must'][] = [
@@ -177,6 +246,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param array $value
+     * @return $this
+     */
     public function whereNotBetween($field, array $value)
     {
         $this->wheres['must_not'][] = [
@@ -191,6 +265,10 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @return $this
+     */
     public function whereExists($field)
     {
         $this->wheres['must'][] = [
@@ -202,6 +280,10 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @return $this
+     */
     public function whereNotExists($field)
     {
         $this->wheres['must_not'][] = [
@@ -213,6 +295,12 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param $value
+     * @param string $flags
+     * @return $this
+     */
     public function whereRegexp($field, $value, $flags = 'ALL')
     {
         $this->wheres['must'][] = [
@@ -227,6 +315,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param string $value
+     * @return $this
+     */
     public function wherePrefix($field, string $value)
     {
         $this->wheres['must'][] = [
@@ -238,6 +331,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param $value
+     * @return $this
+     */
     public function orWhere($field, $value)
     {
         $args = func_get_args();
@@ -252,6 +350,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param array $fields
+     * @param string $value
+     * @return $this
+     */
     public function orWhereMultiMatch(array $fields, string $value)
     {
         $this->wheres['should'][] = [
@@ -264,6 +367,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param string $value
+     * @return $this
+     */
     public function orWherePrefix($field, string $value)
     {
         $this->wheres['should'][] = [
@@ -275,21 +383,35 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getWheres(): array
     {
         return $this->wheres;
     }
 
+    /**
+     * @return array
+     */
     public function getAggregations(): array
     {
         return $this->aggregations;
     }
 
+    /**
+     * @return mixed
+     */
     public function getOrdination()
     {
         return $this->ordination;
     }
 
+    /**
+     * @param $field
+     * @param string $direction
+     * @return $this
+     */
     public function orderBy($field, $direction = 'asc')
     {
         $this->ordination[] = [
@@ -298,6 +420,13 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param int $perPage
+     * @param array $columnsAliases
+     * @param int $page
+     * @param callable|null $toDoAfterSearch
+     * @return array
+     */
     public function paginate($perPage = 15, $columnsAliases = [], $page = 1, callable $toDoAfterSearch = null)
     {
         $firstRow = ($page == 1) ? 0 : ((($page - 1) * $perPage) + 1);
@@ -332,6 +461,9 @@ trait QueryBuilder
         ];
     }
 
+    /**
+     * @return ElasticSearchResponse
+     */
     public function get()
     {
         if ($this->getFrom() > 10000 || $this->getSize() > 10000) { //10000 é o limite padrão
@@ -348,21 +480,33 @@ trait QueryBuilder
         return $this->treatResponse($response);
     }
 
+    /**
+     * @return int
+     */
     public function getFrom(): int
     {
         return $this->from ?? 0;
     }
 
+    /**
+     * @return int
+     */
     public function getSize(): int
     {
         return $this->size ?? 10;
     }
 
+    /**
+     * @return array
+     */
     public function getColumns(): array
     {
         return $this->columns;
     }
 
+    /**
+     * @param int|null $maxResult
+     */
     private function setMaxRowsCanBeSearch(int $maxResult = null): void
     {
         $client = new Client();
@@ -377,11 +521,17 @@ trait QueryBuilder
         ]);
     }
 
+    /**
+     * @return mixed
+     */
     public function getIndex()
     {
         return $this->index;
     }
 
+    /**
+     * @return array
+     */
     private function buildParameters()
     {
         $params = [
@@ -415,6 +565,10 @@ trait QueryBuilder
         return $params;
     }
 
+    /**
+     * @param ElasticSearchAggregation $agg
+     * @return array
+     */
     private function buildAggregationsForRequest(ElasticSearchAggregation $agg)
     {
         $parameters = $agg->buildForRequest();
@@ -427,11 +581,18 @@ trait QueryBuilder
         return $parameters;
     }
 
+    /**
+     * @return string
+     */
     public function getType(): string
     {
         return $this->type;
     }
 
+    /**
+     * @param $response
+     * @return ElasticSearchResponse
+     */
     private function treatResponse($response): ElasticSearchResponse
     {
         $items = collect();
@@ -451,6 +612,10 @@ trait QueryBuilder
         return new ElasticSearchResponse($items, collect($aggregations));
     }
 
+    /**
+     * @param int $row
+     * @return $this
+     */
     public function offset(int $row = 0)
     {
         $this->from = $row;
@@ -458,6 +623,10 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param int $quantity
+     * @return $this
+     */
     public function take(int $quantity = 10)
     {
         $this->size = $quantity;
@@ -465,6 +634,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param array $columnsAliases
+     * @param Collection $items
+     * @return mixed
+     */
     private function applyPaginationAliases(array $columnsAliases, Collection $items)
     {
         return $items
@@ -481,6 +655,10 @@ trait QueryBuilder
             ->filter();
     }
 
+    /**
+     * @param ElasticSearchAggregation $aggregation
+     * @return $this
+     */
     public function agg(ElasticSearchAggregation $aggregation)
     {
         $this->aggregations[] = $aggregation;
@@ -488,6 +666,10 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param string $sentence
+     * @return array
+     */
     public function getMainWords(string $sentence): array
     {
         $words = $this->analyzer('autosearch', $sentence);
@@ -497,6 +679,11 @@ trait QueryBuilder
             ->toArray();
     }
 
+    /**
+     * @param string $name
+     * @param string $toAnalizy
+     * @return mixed
+     */
     public function analyzer(string $name, string $toAnalizy)
     {
         $client = new Client();
@@ -511,6 +698,9 @@ trait QueryBuilder
         return collect(json_decode($response->getBody()->getContents(), true));
     }
 
+    /**
+     * @return array
+     */
     public function getPayload(): array
     {
         $params = $this->buildParameters();
@@ -518,6 +708,10 @@ trait QueryBuilder
         return $params['body'];
     }
 
+    /**
+     * @param array $columns
+     * @return $this
+     */
     public function select(array $columns)
     {
         $this->columns = $columns;

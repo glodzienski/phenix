@@ -2,15 +2,24 @@
 
 namespace glodzienski\AWSElasticsearchService\Aggregations;
 
-use App\ElasticSearch\Contracts\SizeFunctionalityContract;
-use App\ElasticSearch\ElasticSearchAggregationResponseHandler;
-use App\ElasticSearch\ElasticSearchAggregationTypeEnum;
 use App\ElasticSearch\Functionalities\SizeFunctionality;
+use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
+use glodzienski\AWSElasticsearchService\ElasticSearchAggregationResponseHandler;
+use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
 
+/**
+ * Class ElasticSearchTermsAggregation
+ * @package glodzienski\AWSElasticsearchService\Aggregations
+ */
 class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements SizeFunctionalityContract
 {
     use SizeFunctionality;
 
+    /**
+     * ElasticSearchTermsAggregation constructor.
+     * @param string $name
+     * @param string $value
+     */
     public function __construct(string $name, string $value)
     {
         $this->type = ElasticSearchAggregationTypeEnum::TERMS;
@@ -38,6 +47,10 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
         ];
     }
 
+    /**
+     * @param array $values
+     * @return array
+     */
     public function treatResponse(array $values)
     {
         $treated = [];

@@ -2,10 +2,20 @@
 
 namespace glodzienski\AWSElasticsearchService\Aggregations;
 
-use App\ElasticSearch\ElasticSearchAggregationTypeEnum;
 
+use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
+
+/**
+ * Class ElasticSearchAvgAggregation
+ * @package glodzienski\AWSElasticsearchService\Aggregations
+ */
 class ElasticSearchAvgAggregation extends ElasticSearchAggregation
 {
+    /**
+     * ElasticSearchAvgAggregation constructor.
+     * @param string $name
+     * @param string $value
+     */
     public function __construct(string $name, string $value)
     {
         $this->type = ElasticSearchAggregationTypeEnum::AVG;
@@ -26,6 +36,10 @@ class ElasticSearchAvgAggregation extends ElasticSearchAggregation
         ];
     }
 
+    /**
+     * @param array $values
+     * @return mixed
+     */
     public function treatResponse(array $values)
     {
         return $values['value'];

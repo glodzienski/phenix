@@ -4,6 +4,10 @@ namespace glodzienski\AWSElasticsearchService\Enumerators;
 
 use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
 
+/**
+ * Class ElasticSearchAggregationTypeEnum
+ * @package glodzienski\AWSElasticsearchService\Enumerators
+ */
 class ElasticSearchAggregationTypeEnum
 {
     use EnumTricks;

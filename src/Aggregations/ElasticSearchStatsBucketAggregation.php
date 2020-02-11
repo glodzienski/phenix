@@ -2,10 +2,19 @@
 
 namespace glodzienski\AWSElasticsearchService\Aggregations;
 
-use App\ElasticSearch\ElasticSearchAggregationTypeEnum;
+use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
 
+/**
+ * Class ElasticSearchStatsBucketAggregation
+ * @package glodzienski\AWSElasticsearchService\Aggregations
+ */
 class ElasticSearchStatsBucketAggregation extends ElasticSearchAggregation
 {
+    /**
+     * ElasticSearchStatsBucketAggregation constructor.
+     * @param string $name
+     * @param string $bucketsPath
+     */
     public function __construct(string $name, string $bucketsPath)
     {
         $this->type = ElasticSearchAggregationTypeEnum::STATS_BUCKET;
@@ -28,6 +37,10 @@ class ElasticSearchStatsBucketAggregation extends ElasticSearchAggregation
         ];
     }
 
+    /**
+     * @param array $values
+     * @return array|mixed
+     */
     public function treatResponse(array $values)
     {
         return $values;

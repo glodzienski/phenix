@@ -2,11 +2,15 @@
 
 namespace glodzienski\AWSElasticsearchService\Aggregations;
 
-use App\ElasticSearch\Contracts\SizeFunctionalityContract;
-use App\ElasticSearch\ElasticSearchAggregationResponseHandler;
-use App\ElasticSearch\ElasticSearchAggregationTypeEnum;
 use App\ElasticSearch\Functionalities\SizeFunctionality;
+use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
+use glodzienski\AWSElasticsearchService\ElasticSearchAggregationResponseHandler;
+use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
 
+/**
+ * Class ElasticSearchCompositeAggregation
+ * @package glodzienski\AWSElasticsearchService\Aggregations
+ */
 class ElasticSearchCompositeAggregation extends ElasticSearchAggregation implements SizeFunctionalityContract
 {
     use SizeFunctionality;
@@ -14,7 +18,7 @@ class ElasticSearchCompositeAggregation extends ElasticSearchAggregation impleme
     /**
      * ElasticSearchCompositeAggregation constructor.
      * @param string $name
-     * @throws \App\Exceptions\ElasticSearchException
+     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
      */
     public function __construct(string $name)
     {
@@ -56,6 +60,10 @@ class ElasticSearchCompositeAggregation extends ElasticSearchAggregation impleme
         ];
     }
 
+    /**
+     * @param array $values
+     * @return array|mixed
+     */
     public function treatResponse(array $values)
     {
         $treated = [];
@@ -94,6 +102,10 @@ class ElasticSearchCompositeAggregation extends ElasticSearchAggregation impleme
         ];
     }
 
+    /**
+     * @param ElasticSearchAggregation $aggregation
+     * @return $this
+     */
     public function addSource(ElasticSearchAggregation $aggregation): self
     {
         $this->value[] = $aggregation;

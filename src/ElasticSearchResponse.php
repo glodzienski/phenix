@@ -4,6 +4,10 @@ namespace glodzienski\AWSElasticsearchService;
 
 use Illuminate\Support\Collection;
 
+/**
+ * Class ElasticSearchResponse
+ * @package glodzienski\AWSElasticsearchService
+ */
 class ElasticSearchResponse
 {
     /**

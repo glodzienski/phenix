@@ -5,8 +5,15 @@ namespace App\ElasticSearch\Functionalities;
 use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
 use glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException;
 
+/**
+ * Trait SizeFunctionality
+ * @package App\ElasticSearch\Functionalities
+ */
 trait SizeFunctionality
 {
+    /**
+     * @var int
+     */
     public $size = 0;
 
     /**

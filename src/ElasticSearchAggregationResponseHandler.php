@@ -4,8 +4,17 @@ namespace glodzienski\AWSElasticsearchService;
 
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
 
+/**
+ * Class ElasticSearchAggregationResponseHandler
+ * @package glodzienski\AWSElasticsearchService
+ */
 class ElasticSearchAggregationResponseHandler
 {
+    /**
+     * @param ElasticSearchAggregation $agg
+     * @param array $aggregationsValues
+     * @return mixed|string
+     */
     public static function treat(ElasticSearchAggregation $agg, array $aggregationsValues)
     {
         if ($agg->hasToIgnoreHandler()) {
@@ -27,6 +36,11 @@ class ElasticSearchAggregationResponseHandler
         return $treated;
     }
 
+    /**
+     * @param $aggregationsSchema
+     * @param $aggregationsValues
+     * @return array
+     */
     public static function go($aggregationsSchema, $aggregationsValues)
     {
         $treatedResponse = [];

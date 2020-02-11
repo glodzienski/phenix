@@ -2,12 +2,16 @@
 
 namespace glodzienski\AWSElasticsearchService\Aggregations;
 
-use App\ElasticSearch\Contracts\OffsetFunctionalityContract;
-use App\ElasticSearch\Contracts\SizeFunctionalityContract;
-use App\ElasticSearch\ElasticSearchAggregationTypeEnum;
-use App\ElasticSearch\Functionalities\OffesetFunctionality;
 use App\ElasticSearch\Functionalities\SizeFunctionality;
+use glodzienski\AWSElasticsearchService\Contracts\OffsetFunctionalityContract;
+use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
+use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
+use glodzienski\AWSElasticsearchService\Functionalities\OffesetFunctionality;
 
+/**
+ * Class ElasticSearchBucketSortAggregation
+ * @package glodzienski\AWSElasticsearchService\Aggregations
+ */
 class ElasticSearchBucketSortAggregation
     extends ElasticSearchAggregation
     implements SizeFunctionalityContract, OffsetFunctionalityContract
@@ -18,7 +22,7 @@ class ElasticSearchBucketSortAggregation
     /**
      * ElasticSearchBucketSortAggregation constructor.
      * @param string $name
-     * @throws \App\Exceptions\ElasticSearchException
+     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
      */
     public function __construct(string $name)
     {
@@ -47,12 +51,20 @@ class ElasticSearchBucketSortAggregation
         ];
     }
 
+    /**
+     * @param array $values
+     * @return mixed
+     */
     public function treatResponse(array $values)
     {
         return $values['value'];
     }
 
-
+    /**
+     * @param string $aggregationPath
+     * @param $sortType
+     * @return $this
+     */
     public function addSorter(string $aggregationPath, $sortType): self
     {
         $this->value[] = [

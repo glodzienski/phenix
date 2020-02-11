@@ -2,6 +2,10 @@
 
 namespace glodzienski\AWSElasticsearchService\Helpers;
 
+/**
+ * Trait EnumTricks
+ * @package glodzienski\AWSElasticsearchService\Helpers
+ */
 trait EnumTricks
 {
     /**
