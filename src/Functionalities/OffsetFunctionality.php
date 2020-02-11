@@ -9,7 +9,7 @@ use glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException;
  * Trait OffesetFunctionality
  * @package glodzienski\AWSElasticsearchService\Functionalities
  */
-trait OffesetFunctionality
+trait OffsetFunctionality
 {
     /**
      * @var int

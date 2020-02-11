@@ -2,11 +2,11 @@
 
 namespace glodzienski\AWSElasticsearchService\Aggregations;
 
-use App\ElasticSearch\Functionalities\SizeFunctionality;
 use glodzienski\AWSElasticsearchService\Contracts\OffsetFunctionalityContract;
 use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
-use glodzienski\AWSElasticsearchService\Functionalities\OffesetFunctionality;
+use glodzienski\AWSElasticsearchService\Functionalities\OffsetFunctionality;
+use glodzienski\AWSElasticsearchService\Functionalities\SizeFunctionality;
 
 /**
  * Class ElasticSearchBucketSortAggregation
@@ -17,7 +17,7 @@ class ElasticSearchBucketSortAggregation
     implements SizeFunctionalityContract, OffsetFunctionalityContract
 {
     use SizeFunctionality,
-        OffesetFunctionality;
+        OffsetFunctionality;
 
     /**
      * ElasticSearchBucketSortAggregation constructor.

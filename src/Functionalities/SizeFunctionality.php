@@ -1,13 +1,13 @@
 <?php
 
-namespace App\ElasticSearch\Functionalities;
+namespace glodzienski\AWSElasticsearchService\Functionalities;
 
 use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
 use glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException;
 
 /**
  * Trait SizeFunctionality
- * @package App\ElasticSearch\Functionalities
+ * @package glodzienski\AWSElasticsearchService\Functionalities
  */
 trait SizeFunctionality
 {
