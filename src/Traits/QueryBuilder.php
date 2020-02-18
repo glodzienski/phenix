@@ -741,7 +741,7 @@ trait QueryBuilder
      * @param string $time
      * @return $this
      */
-    public function scroll(string $time)
+    public function setScroll(string $time)
     {
         $this->scroll= $time;
 
@@ -751,8 +751,41 @@ trait QueryBuilder
     /**
      * @return string
      */
-    public function getScroll(): string
+    public function getScroll()
     {
         return $this->scroll;
+    }
+
+    /**
+     * @param string $hash
+     * @param string $time
+     * @return ElasticSearchResponse
+     */
+    public static function scroll(string $hash, string $time = '1m'): ElasticSearchResponse
+    {
+        $client = new Client();
+
+        $requestPayload = [
+            'json' => [
+                'scroll' => $time,
+                'scroll_id' => $hash
+            ]
+        ];
+        try {
+            $response = $client->post(config('elasticsearch.host') . "/_search/scroll", $requestPayload)
+                ->getBody()
+                ->getContents();
+
+            $instance = (new static)->newQuery();
+
+            return $instance
+                ->newQuery()
+                ->treatResponse(json_decode($response, true));
+        } catch (\Exception $exception) {
+            $failureResponse = new ElasticSearchResponse(collect());
+            $failureResponse->scrollHasMissedTheCache = true;
+
+            return $failureResponse;
+        }
     }
 }

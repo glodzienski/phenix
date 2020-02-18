@@ -22,6 +22,10 @@ class ElasticSearchResponse
      * @var string
      */
     private $scroll;
+    /**
+     * @var bool
+     */
+    public $scrollHasMissedTheCache;
 
     /**
      * ElasticSearchResponse constructor.
@@ -32,6 +36,7 @@ class ElasticSearchResponse
     {
         $this->items = $items;
         $this->aggs = $aggs;
+        $this->scrollHasMissedTheCache = false;
     }
 
     /**
@@ -66,7 +71,7 @@ class ElasticSearchResponse
     /**
      * @return string
      */
-    public function getScroll()
+    public function getScroll(): string
     {
         return $this->scroll;
     }
