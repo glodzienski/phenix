@@ -78,20 +78,25 @@ class ElasticSearch
 
     /**
      * @param array $query
-     * @param array $options [sort, size, from, query]
+     * @param array $options
      * @param array $range
-     * @param string $type
-     * @param string $index
-     * @return array|null
+     * @param $type
+     * @param $index
+     * @param string|null $scrollTime
+     * @return |null
      * @throws \Exception
      */
-    private function search(array $query = [], array $options = [], array $range = [], $type, $index)
+    private function search(array $query = [], array $options = [], array $range = [], $type, $index, string $scrollTime = null)
     {
         $params = [
             'index' => $index,
             'type' => $type,
             'body' => $options,
         ];
+
+        if (isset($scrollTime)) {
+            $params['scroll'] = $scrollTime;
+        }
 
         // create query filters
         $filters = $this->setSearchQueryFilters(collect($query), [], $type);

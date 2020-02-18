@@ -51,6 +51,10 @@ trait QueryBuilder
      * @var
      */
     private $size;
+    /**
+     * @var string
+     */
+    private $scroll;
 
     /**
      * @param string $index
@@ -471,7 +475,15 @@ trait QueryBuilder
         }
 
         $params = $this->buildParameters();
-        $response = app('elasticsearch')->search(null, $params['body'], null, $this->getType(), $this->getIndex());
+        $response = app('elasticsearch')
+            ->search(
+                null,
+                $params['body'],
+                null,
+                $this->getType(),
+                $this->getIndex(),
+                $this->getScroll()
+            );
 
         if ($this->getFrom() > 10000 || $this->getSize() > 10000) { //10000 é o limite padrão
             $this->setMaxRowsCanBeSearch(10000);
@@ -717,5 +729,24 @@ trait QueryBuilder
         $this->columns = $columns;
 
         return $this;
+    }
+
+    /**
+     * @param string $time
+     * @return $this
+     */
+    public function scroll(string $time)
+    {
+        $this->scroll= $time;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScroll(): string
+    {
+        return $this->scroll;
     }
 }
