@@ -18,6 +18,10 @@ class ElasticSearchResponse
      * @var Collection|null
      */
     private $aggs;
+    /**
+     * @var string
+     */
+    private $scroll;
 
     /**
      * ElasticSearchResponse constructor.
@@ -57,5 +61,21 @@ class ElasticSearchResponse
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScroll(): string
+    {
+        return $this->scroll;
+    }
+
+    /**
+     * @param string $scroll
+     */
+    public function setScroll(string $scroll): void
+    {
+        $this->scroll = $scroll;
     }
 }

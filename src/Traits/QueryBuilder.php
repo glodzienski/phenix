@@ -621,7 +621,13 @@ trait QueryBuilder
         $aggs = $response['aggregations'] ?? [];
         $aggregations = ElasticSearchAggregationResponseHandler::go($this->aggregations, $aggs);
 
-        return new ElasticSearchResponse($items, collect($aggregations));
+        $elasticSearchResponse = new ElasticSearchResponse($items, collect($aggregations));
+
+        if (array_key_exists('_scroll_id', $response)) {
+            $elasticSearchResponse->setScroll($response['_scroll_id']);
+        }
+
+        return $elasticSearchResponse;
     }
 
     /**
