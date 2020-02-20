@@ -71,7 +71,7 @@ class ElasticSearchResponse
     /**
      * @return string
      */
-    public function getScroll(): string
+    public function getScroll()
     {
         return $this->scroll;
     }
