@@ -86,7 +86,12 @@ class ElasticSearch
      * @return |null
      * @throws \Exception
      */
-    private function search(array $query = [], array $options = [], array $range = [], $type, $index, string $scrollTime = null)
+    private function search(array $query = [],
+                            array $options = [],
+                            array $range = [],
+                            $type,
+                            $index,
+                            string $scrollTime = null)
     {
         $params = [
             'index' => $index,
@@ -117,11 +122,6 @@ class ElasticSearch
 
         $hits = null;
         $method = 'search';
-
-        if (isset($params['body']['size']) && $params['body']['size'] == 0) {
-            $method = 'count';
-            unset($params['body']['size']);
-        }
 
         try {
             $hits = $this->client->$method($params);

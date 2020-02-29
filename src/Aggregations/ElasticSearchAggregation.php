@@ -100,18 +100,24 @@ abstract class ElasticSearchAggregation
 
     /**
      * @param ElasticSearchAggregation $aggregation
+     * @return $this
      */
-    public function setParent(ElasticSearchAggregation $aggregation): void
+    public function setParent(ElasticSearchAggregation $aggregation)
     {
         $this->parentAggregation = $aggregation;
+
+        return $this;
     }
 
     /**
      * @param ElasticSearchAggregation $aggregation
+     * @return $this
      */
-    public function setChild(ElasticSearchAggregation $aggregation): void
+    public function setChild(ElasticSearchAggregation $aggregation)
     {
         $this->childrenAggregations[] = $aggregation;
+
+        return $this;
     }
 
     /**

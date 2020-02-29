@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
  * Trait QueryBuilder
  * @package glodzienski\AWSElasticsearchService\Traits
  */
-trait QueryBuilder
+trait Builder
 {
     /**
      * @var array
@@ -58,7 +58,7 @@ trait QueryBuilder
 
     /**
      * @param string $index
-     * @return QueryBuilder
+     * @return Builder
      */
     public static function index(string $index)
     {
@@ -448,7 +448,7 @@ trait QueryBuilder
         $data = $result->getItems();
 
         if (!is_null($toDoAfterSearch)) {
-            $data = $toDoAfterSearch($data, $result->getAggs());
+            $data = $toDoAfterSearch($data, $result->getAggregations());
         }
         if (!is_null($columnsAliases) && !empty($columnsAliases)) {
             $data = $this->applyPaginationAliases($columnsAliases, $data);
@@ -613,17 +613,22 @@ trait QueryBuilder
             return new ElasticSearchResponse($items);
         }
 
+        // TODO Develop ElasticSearchSourceResponseHandler
         $hits = $response['hits']['hits'];
         foreach ($hits as $hit) {
             $items->push(collect($hit['_source']));
         }
 
-        $aggs = $response['aggregations'] ?? [];
-        $aggregations = ElasticSearchAggregationResponseHandler::go($this->aggregations, $aggs);
+        $aggregations = $response['aggregations'] ?? [];
+        $aggregations = ElasticSearchAggregationResponseHandler::go($this->aggregations, $aggregations);
 
         $elasticSearchResponse = new ElasticSearchResponse($items, collect($aggregations));
 
-        if (array_key_exists('_scroll_id', $response)) {
+        if (key_exists('total', $response['total'])) {
+            $elasticSearchResponse->setTotalHits($response['total']);
+        }
+
+        if (key_exists('_scroll_id', $response)) {
             $elasticSearchResponse->setScroll($response['_scroll_id']);
         }
 

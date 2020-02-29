@@ -17,7 +17,11 @@ class ElasticSearchResponse
     /**
      * @var Collection|null
      */
-    private $aggs;
+    private $aggregations;
+    /**
+     * @var int
+     */
+    private $totalHits;
     /**
      * @var string
      */
@@ -30,12 +34,12 @@ class ElasticSearchResponse
     /**
      * ElasticSearchResponse constructor.
      * @param Collection $items
-     * @param Collection|null $aggs
+     * @param Collection|null $aggregations
      */
-    public function __construct(Collection $items, Collection $aggs = null)
+    public function __construct(Collection $items, Collection $aggregations = null)
     {
         $this->items = $items;
-        $this->aggs = $aggs;
+        $this->aggregations = $aggregations;
         $this->scrollHasMissedTheCache = false;
     }
 
@@ -50,19 +54,19 @@ class ElasticSearchResponse
     /**
      * @return mixed
      */
-    public function getAggs()
+    public function getAggregations()
     {
-        return $this->aggs;
+        return $this->aggregations;
     }
 
     /**
-     * @param string $aggName
+     * @param string $aggregationName
      * @return mixed
      */
-    public function getAgg(string $aggName)
+    public function getAgg(string $aggregationName)
     {
-        if (isset($this->aggs) && $this->aggs->has($aggName)) {
-            return $this->aggs->get($aggName);
+        if (isset($this->aggregations) && $this->aggregations->has($aggregationName)) {
+            return $this->aggregations->get($aggregationName);
         }
 
         return null;
@@ -83,4 +87,22 @@ class ElasticSearchResponse
     {
         $this->scroll = $scroll;
     }
+
+    /**
+     * @return int
+     */
+    public function getTotalHits(): int
+    {
+        return $this->totalHits;
+    }
+
+    /**
+     * @param int $totalHits
+     */
+    public function setTotalHits(int $totalHits): void
+    {
+        $this->totalHits = $totalHits;
+    }
+
+
 }

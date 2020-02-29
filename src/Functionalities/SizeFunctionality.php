@@ -14,7 +14,7 @@ trait SizeFunctionality
     /**
      * @var int
      */
-    public $size = 0;
+    public $size;
 
     /**
      * @param int $rows
