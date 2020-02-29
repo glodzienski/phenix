@@ -442,10 +442,10 @@ trait Builder
             ->offset($firstRow)
             ->get();
 
-        $totalRows = $result->getAgg('rowSums');
+        $totalRows = $result->getAggregation('rowSums');
         $lastPage = ceil($totalRows / $perPage);
 
-        $data = $result->getItems();
+        $data = $result->getSources();
 
         if (!is_null($toDoAfterSearch)) {
             $data = $toDoAfterSearch($data, $result->getAggregations());

@@ -13,7 +13,7 @@ class ElasticSearchResponse
     /**
      * @var Collection
      */
-    private $items;
+    private $sources;
     /**
      * @var Collection|null
      */
@@ -33,28 +33,45 @@ class ElasticSearchResponse
 
     /**
      * ElasticSearchResponse constructor.
-     * @param Collection $items
+     * @param Collection|null $sources
      * @param Collection|null $aggregations
      */
-    public function __construct(Collection $items, Collection $aggregations = null)
+    public function __construct(?Collection $sources, ?Collection $aggregations)
     {
-        $this->items = $items;
-        $this->aggregations = $aggregations;
+        $this->sources = $sources ?? collect();
+        $this->aggregations = $aggregations ?? collect();
         $this->scrollHasMissedTheCache = false;
+        $this->totalHits = 0;
     }
 
     /**
-     * @return mixed
+     * @param Collection $sources
      */
-    public function getItems()
+    public function setSources(Collection $sources): void
     {
-        return $this->items;
+        $this->sources = $sources;
+    }
+
+    /**
+     * @param Collection|null $aggregations
+     */
+    public function setAggregations(?Collection $aggregations): void
+    {
+        $this->aggregations = $aggregations;
     }
 
     /**
      * @return mixed
      */
-    public function getAggregations()
+    public function getSources(): Collection
+    {
+        return $this->sources;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAggregations(): Collection
     {
         return $this->aggregations;
     }
@@ -63,7 +80,7 @@ class ElasticSearchResponse
      * @param string $aggregationName
      * @return mixed
      */
-    public function getAgg(string $aggregationName)
+    public function getAggregation(string $aggregationName)
     {
         if (isset($this->aggregations) && $this->aggregations->has($aggregationName)) {
             return $this->aggregations->get($aggregationName);
@@ -103,6 +120,4 @@ class ElasticSearchResponse
     {
         $this->totalHits = $totalHits;
     }
-
-
 }
