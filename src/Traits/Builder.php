@@ -624,8 +624,9 @@ trait Builder
 
         $elasticSearchResponse = new ElasticSearchResponse($items, collect($aggregations));
 
-        if (key_exists('total', $response['total'])) {
-            $elasticSearchResponse->setTotalHits($response['total']);
+        $hits = $response['hits'];
+        if (key_exists('total', $hits)) {
+            $elasticSearchResponse->setTotalHits($hits['total']);
         }
 
         if (key_exists('_scroll_id', $response)) {
