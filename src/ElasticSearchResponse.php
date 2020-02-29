@@ -36,7 +36,7 @@ class ElasticSearchResponse
      * @param Collection|null $sources
      * @param Collection|null $aggregations
      */
-    public function __construct(?Collection $sources, ?Collection $aggregations)
+    public function __construct(?Collection $sources = null, ?Collection $aggregations = null)
     {
         $this->sources = $sources ?? collect();
         $this->aggregations = $aggregations ?? collect();
