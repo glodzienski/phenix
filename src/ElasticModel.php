@@ -2,7 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService;
 
-use glodzienski\AWSElasticsearchService\Traits\Builder;
+use glodzienski\AWSElasticsearchService\Traits\QueryBuilder;
 
 /**
  * Class ElasticModel
@@ -10,5 +10,5 @@ use glodzienski\AWSElasticsearchService\Traits\Builder;
  */
 abstract class ElasticModel
 {
-    use Builder;
+    use QueryBuilder;
 }

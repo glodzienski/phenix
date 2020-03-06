@@ -3,7 +3,7 @@
 namespace glodzienski\AWSElasticsearchService\Aggregations;
 
 use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
-use glodzienski\AWSElasticsearchService\ElasticSearchAggregationResponseHandler;
+use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
 use glodzienski\AWSElasticsearchService\Functionalities\SizeFunctionality;
 

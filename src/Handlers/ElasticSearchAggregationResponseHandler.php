@@ -1,6 +1,6 @@
 <?php
 
-namespace glodzienski\AWSElasticsearchService;
+namespace glodzienski\AWSElasticsearchService\Handlers;
 
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
 

@@ -4,7 +4,7 @@ namespace glodzienski\AWSElasticsearchService\Traits;
 
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchValueCountAggregation;
-use glodzienski\AWSElasticsearchService\ElasticSearchAggregationResponseHandler;
+use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
  * Trait QueryBuilder
  * @package glodzienski\AWSElasticsearchService\Traits
  */
-trait Builder
+trait QueryBuilder
 {
     /**
      * @var array
@@ -58,7 +58,7 @@ trait Builder
 
     /**
      * @param string $index
-     * @return Builder
+     * @return QueryBuilder
      */
     public static function index(string $index)
     {
@@ -554,7 +554,7 @@ trait Builder
         $params['type'] = $this->type;
 
         if (!empty($this->wheres)) {
-            $params['body']['query']['bool'] = $this->wheres;
+            $params['body']['query']['bool'] = $this->buildConditionsForRequest();
         }
         if (!empty($this->aggregations)) {
             foreach ($this->aggregations as $agg) {
@@ -583,6 +583,19 @@ trait Builder
      */
     private function buildAggregationsForRequest(ElasticSearchAggregation $agg)
     {
+        $parameters = $agg->buildForRequest();
+        if ($agg->hasChildren()) {
+            foreach ($agg->getChildren() as $aggChild) {
+                $parameters['aggs'][$aggChild->name] = $this->buildAggregationsForRequest($aggChild);
+            }
+        }
+
+        return $parameters;
+    }
+
+    private function buildConditionsForRequest()
+    {
+        // TODO continuar daqui
         $parameters = $agg->buildForRequest();
         if ($agg->hasChildren()) {
             foreach ($agg->getChildren() as $aggChild) {
@@ -749,7 +762,7 @@ trait Builder
      */
     public function setScroll(string $time)
     {
-        $this->scroll= $time;
+        $this->scroll = $time;
 
         return $this;
     }
