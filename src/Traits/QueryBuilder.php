@@ -553,8 +553,11 @@ trait QueryBuilder
         $params['index'] = $this->index;
         $params['type'] = $this->type;
 
+//        if (!empty($this->wheres)) {
+//            $params['body']['query']['bool'] = $this->buildConditionsForRequest();
+//        }
         if (!empty($this->wheres)) {
-            $params['body']['query']['bool'] = $this->buildConditionsForRequest();
+            $params['body']['query']['bool'] = $this->wheres;
         }
         if (!empty($this->aggregations)) {
             foreach ($this->aggregations as $agg) {
