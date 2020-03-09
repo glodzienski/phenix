@@ -12,4 +12,5 @@ class ElasticSearchConditionTypeEnum
 {
     use EnumTricks;
     public const TERM = 'term';
+    public const RANGE = 'range';
 }

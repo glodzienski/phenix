@@ -2,7 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService\Builders;
 
-use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchCondition;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionDeterminantTypeEnum;
 use glodzienski\AWSElasticsearchService\Schema\ElasticSearchConditionBoolSchema;
 use Illuminate\Support\Collection;
@@ -12,7 +12,7 @@ class ElasticSearchConditionBoolBuilder
     /**
      * @var Collection
      */
-    protected $nestedBools;
+    private $nestedBools;
     /**
      * @var Collection
      */
@@ -96,13 +96,13 @@ class ElasticSearchConditionBoolBuilder
             })
             ->toArray();
 
-        $nestedConditions = $conditions
-            ->filter(function ($condition) {
-                return $condition instanceof ElasticSearchConditionBoolBuilder;
-            })
-            ->map(function (ElasticSearchConditionBoolBuilder $condition) {
-                return $condition->buildForRequest();
-            });
+        if ($this->hasNestedBools()) {
+            $nestedConditions = $this->nestedBools
+                ->map(function (ElasticSearchConditionBoolBuilder $condition) {
+                    return ['query' => ['bool' => $condition->buildForRequest()]];
+                });
+            $conditionBoolSchema->must = array_merge($conditionBoolSchema->must, $nestedConditions->toArray());
+        }
 
         return $conditionBoolSchema;
     }

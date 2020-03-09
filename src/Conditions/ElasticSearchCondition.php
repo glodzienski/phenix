@@ -1,6 +1,6 @@
 <?php
 
-namespace glodzienski\AWSElasticsearchService\Aggregations;
+namespace glodzienski\AWSElasticsearchService\Conditions;
 
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionDeterminantTypeEnum;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionTypeEnum;
@@ -8,21 +8,36 @@ use Illuminate\Support\Collection;
 
 /**
  * Class ElasticSearchCondition
- * @package glodzienski\AWSElasticsearchService\Aggregations
+ * @package glodzienski\AWSElasticsearchService\Conditions
  */
 abstract class ElasticSearchCondition
 {
     /**
-     * Propriedades para funcionamento em comum de todas as condições
-     * */
-
+     * @var mixed
+     */
     public $value;
+    /**
+     * @var string
+     */
     public $field;
+    /**
+     * @var string
+     */
     public $determinantType = ElasticSearchConditionDeterminantTypeEnum::MUST;
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * @return array
+     */
     abstract public function buildForRequest(): array;
 
+    /**
+     * @param array $values
+     * @return mixed
+     */
     abstract public function treatResponse(array $values);
 
     /**

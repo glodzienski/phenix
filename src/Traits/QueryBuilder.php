@@ -3,9 +3,12 @@
 namespace glodzienski\AWSElasticsearchService\Traits;
 
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
-use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchTermCondition;
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchValueCountAggregation;
 use glodzienski\AWSElasticsearchService\Builders\ElasticSearchConditionBoolBuilder;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchMatchCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchRangeCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchTermCondition;
+use glodzienski\AWSElasticsearchService\Enumerators\ConditionRangeTypeEnum;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionDeterminantTypeEnum;
 use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
@@ -115,68 +118,43 @@ trait QueryBuilder
      * @param $field
      * @param $operator
      * @param $value
+     * @throws \ReflectionException
+     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
      */
     private function applyCommonWhere($groupRequest, $field, $operator, $value): void
     {
         switch ($operator) {
             case '=':
+            case '!=':
+            case '<>':
                 $this->conditionBoolBuilder->addCondition(new ElasticSearchTermCondition($field, $value, $groupRequest));
                 break;
             case '>':
-                $this->wheres[$groupRequest][] = [
-                    'range' => [
-                        $field => [
-                            'gt' => $value
-                        ]
-                    ]
-                ];
+                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::GREATER_THAN);
+                $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case '<':
-                $this->wheres[$groupRequest][] = [
-                    'range' => [
-                        $field => [
-                            'lt' => $value
-                        ]
-                    ]
-                ];
+                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::LESS_THAN);
+                $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case '>=':
-                $this->wheres[$groupRequest][] = [
-                    'range' => [
-                        $field => [
-                            'gte' => $value
-                        ]
-                    ]
-                ];
+                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::GREATER_THAN_OR_EQUAL);
+                $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case '<=':
-                $this->wheres[$groupRequest][] = [
-                    'range' => [
-                        $field => [
-                            'lte' => $value
-                        ]
-                    ]
-                ];
-                break;
-            case '!=':
-            case '<>':
-                $this->wheres['must_not'][] = [
-                    'term' => [
-                        $field => $value
-                    ]
-                ];
+                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::LESS_THAN_OR_EQUAL);
+                $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case 'like':
-                $this->wheres[$groupRequest][] = [
-                    'match' => [
-                        $field => $value
-                    ]
-                ];
+                $this->conditionBoolBuilder->addCondition(new ElasticSearchMatchCondition($field, $value, $groupRequest));
                 break;
         }
     }
 
-    private function applyNestedWhere(\Closure $field)
+    /**
+     * @param \Closure $field
+     */
+    private function applyNestedWhere(\Closure $field): void
     {
         $nestedConditionBoolBuilder = new ElasticSearchConditionBoolBuilder();
 
@@ -210,6 +188,37 @@ trait QueryBuilder
         }
 
         self::applyCommonWhere(ElasticSearchConditionDeterminantTypeEnum::MUST, $field, $operator, $value);
+
+        return $this;
+    }
+
+    public function teste($field, $value = null)
+    {
+        if ($field instanceof \Closure) {
+            self::applyNestedWhere($field);
+
+            return $this;
+        }
+
+        $args = func_get_args();
+        if (count($args) == 3) {
+            list($field, $operator, $value) = $args;
+        }
+        else {
+            $operator = '=';
+        }
+
+        self::applyCommonWhere(ElasticSearchConditionDeterminantTypeEnum::MUST_NOT, $field, $operator, $value);
+    }
+
+    /**
+     * @param $field
+     * @param $value
+     * @return $this
+     */
+    public function whereNot(...$params)
+    {
+        $this->teste(...$params);
 
         return $this;
     }
@@ -422,14 +431,6 @@ trait QueryBuilder
     /**
      * @return array
      */
-    public function getWheres(): array
-    {
-        return $this->wheres;
-    }
-
-    /**
-     * @return array
-     */
     public function getAggregations(): array
     {
         return $this->aggregations;
@@ -584,13 +585,8 @@ trait QueryBuilder
 
         $params['index'] = $this->index;
         $params['type'] = $this->type;
+        $params['body']['query']['bool'] = $this->conditionBoolBuilder->buildForRequest();
 
-        if (!empty($this->wheres)) {
-            $params['body']['query']['bool'] = $this->buildConditionsForRequest();
-        }
-//        if (!empty($this->wheres)) {
-//            $params['body']['query']['bool'] = $this->wheres;
-//        }
         if (!empty($this->aggregations)) {
             foreach ($this->aggregations as $agg) {
                 $params['body']['aggs'][$agg->name] = $this->buildAggregationsForRequest($agg);
@@ -626,11 +622,6 @@ trait QueryBuilder
         }
 
         return $parameters;
-    }
-
-    private function buildConditionsForRequest(): array
-    {
-        return $this->conditionBoolBuilder->buildForRequest();
     }
 
     /**
