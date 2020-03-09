@@ -136,7 +136,7 @@ class ElasticSearchConditionBoolBuilder
     {
         $this->nestedBools
             ->each(function (ElasticSearchConditionBoolBuilder $conditionBoolBuilder) use (&$conditionBoolSchema) {
-                $buildedPayload = ['query' => ['bool' => $conditionBoolBuilder->buildForRequest()]];
+                $buildedPayload = ['bool' => $conditionBoolBuilder->buildForRequest()];
 
                 $conditionBoolBuilderDeterminantType = $conditionBoolBuilder->getBoolDeterminantType();
                 $conditionBoolSchema->{$conditionBoolBuilderDeterminantType}[] = $buildedPayload;
