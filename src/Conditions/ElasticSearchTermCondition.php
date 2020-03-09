@@ -17,6 +17,7 @@ class ElasticSearchTermCondition extends ElasticSearchCondition
         $this->type = ElasticSearchConditionTypeEnum::TERM;
         $this->field = $field;
         $this->value = $value;
+        $this->determinantType = $conditionDeterminantType;
     }
 
     /**

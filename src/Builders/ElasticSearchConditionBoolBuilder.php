@@ -4,6 +4,7 @@ namespace glodzienski\AWSElasticsearchService\Builders;
 
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchCondition;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionDeterminantTypeEnum;
+use glodzienski\AWSElasticsearchService\Schema\ElasticSearchConditionBoolSchema;
 use Illuminate\Support\Collection;
 
 class ElasticSearchConditionBoolBuilder
@@ -63,21 +64,60 @@ class ElasticSearchConditionBoolBuilder
         return !empty($this->nestedBools);
     }
 
-    public function buildForRequest(): array
+    public function buildForRequest(): ElasticSearchConditionBoolSchema
     {
+        $conditionBoolSchema = new ElasticSearchConditionBoolSchema();
         $conditions = $this->getConditions();
 
-        $conditions
+        $conditionBoolSchema->must = $conditions
             ->where('determinantType', ElasticSearchConditionDeterminantTypeEnum::MUST)
             ->map(function (ElasticSearchCondition $condition) {
                 return [
                     $condition->getSintax() => $condition->buildForRequest()
                 ];
+            })
+            ->toArray();
+
+        $conditionBoolSchema->must_not = $conditions
+            ->where('determinantType', ElasticSearchConditionDeterminantTypeEnum::MUST_NOT)
+            ->map(function (ElasticSearchCondition $condition) {
+                return [
+                    $condition->getSintax() => $condition->buildForRequest()
+                ];
+            })
+            ->toArray();
+
+        $conditionBoolSchema->should = $conditions
+            ->where('determinantType', ElasticSearchConditionDeterminantTypeEnum::SHOULD)
+            ->map(function (ElasticSearchCondition $condition) {
+                return [
+                    $condition->getSintax() => $condition->buildForRequest()
+                ];
+            })
+            ->toArray();
+
+        $nestedConditions = $conditions
+            ->filter(function ($condition) {
+                return $condition instanceof ElasticSearchConditionBoolBuilder;
+            })
+            ->map(function (ElasticSearchConditionBoolBuilder $condition) {
+                return $condition->buildForRequest();
             });
 
-        // get all must conditions
-        // get all must not conditions
-        // get all should conditions
-        // get all nested conditions
+        return $conditionBoolSchema;
+    }
+
+    public function addCondition(ElasticSearchCondition $elasticSearchCondition)
+    {
+        $this->conditions->push($elasticSearchCondition);
+
+        return $this;
+    }
+
+    public function addNestedBool(ElasticSearchConditionBoolBuilder $elasticSearchConditionBoolBuilder)
+    {
+        $this->nestedBools->push($elasticSearchConditionBoolBuilder);
+
+        return $this;
     }
 }

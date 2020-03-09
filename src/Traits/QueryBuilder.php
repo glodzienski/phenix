@@ -3,7 +3,10 @@
 namespace glodzienski\AWSElasticsearchService\Traits;
 
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
+use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchTermCondition;
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchValueCountAggregation;
+use glodzienski\AWSElasticsearchService\Builders\ElasticSearchConditionBoolBuilder;
+use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionDeterminantTypeEnum;
 use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
 use GuzzleHttp\Client;
@@ -31,6 +34,10 @@ trait QueryBuilder
      * @var array
      */
     private $aggregations = [];
+    /**
+     * @var ElasticSearchConditionBoolBuilder
+     */
+    private $conditionBoolBuilder;
     /**
      * @var
      */
@@ -86,10 +93,20 @@ trait QueryBuilder
     }
 
     /**
+     * @return void
+     */
+    private function setup(): void
+    {
+        $this->conditionBoolBuilder = new ElasticSearchConditionBoolBuilder();
+    }
+
+    /**
      * @return $this
      */
     public function newQuery()
     {
+        $this->setup();
+
         return $this;
     }
 
@@ -103,11 +120,7 @@ trait QueryBuilder
     {
         switch ($operator) {
             case '=':
-                $this->wheres[$groupRequest][] = [
-                    'term' => [
-                        $field => $value
-                    ]
-                ];
+                $this->conditionBoolBuilder->addCondition(new ElasticSearchTermCondition($field, $value, $groupRequest));
                 break;
             case '>':
                 $this->wheres[$groupRequest][] = [
@@ -163,21 +176,40 @@ trait QueryBuilder
         }
     }
 
+    private function applyNestedWhere(\Closure $field)
+    {
+        $nestedConditionBoolBuilder = new ElasticSearchConditionBoolBuilder();
+
+        $currentBool = $this->getConditionBoolBuilder();
+        $currentBool->addNestedBool($nestedConditionBoolBuilder);
+
+        $this->setConditionBoolBuilder($nestedConditionBoolBuilder);
+        call_user_func($field, $this);
+        $this->setConditionBoolBuilder($currentBool);
+    }
+
     /**
      * @param $field
      * @param $value
      * @return $this
      */
-    public function where($field, $value)
+    public function where($field, $value = null)
     {
+        if ($field instanceof \Closure) {
+            self::applyNestedWhere($field);
+
+            return $this;
+        }
+
         $args = func_get_args();
         if (count($args) == 3) {
             list($field, $operator, $value) = $args;
-        } else {
+        }
+        else {
             $operator = '=';
         }
 
-        self::applyCommonWhere('must', $field, $operator, $value);
+        self::applyCommonWhere(ElasticSearchConditionDeterminantTypeEnum::MUST, $field, $operator, $value);
 
         return $this;
     }
@@ -553,12 +585,12 @@ trait QueryBuilder
         $params['index'] = $this->index;
         $params['type'] = $this->type;
 
-//        if (!empty($this->wheres)) {
-//            $params['body']['query']['bool'] = $this->buildConditionsForRequest();
-//        }
         if (!empty($this->wheres)) {
-            $params['body']['query']['bool'] = $this->wheres;
+            $params['body']['query']['bool'] = $this->buildConditionsForRequest();
         }
+//        if (!empty($this->wheres)) {
+//            $params['body']['query']['bool'] = $this->wheres;
+//        }
         if (!empty($this->aggregations)) {
             foreach ($this->aggregations as $agg) {
                 $params['body']['aggs'][$agg->name] = $this->buildAggregationsForRequest($agg);
@@ -596,17 +628,9 @@ trait QueryBuilder
         return $parameters;
     }
 
-    private function buildConditionsForRequest()
+    private function buildConditionsForRequest(): array
     {
-        // TODO continuar daqui
-        $parameters = $agg->buildForRequest();
-        if ($agg->hasChildren()) {
-            foreach ($agg->getChildren() as $aggChild) {
-                $parameters['aggs'][$aggChild->name] = $this->buildAggregationsForRequest($aggChild);
-            }
-        }
-
-        return $parameters;
+        return $this->conditionBoolBuilder->buildForRequest();
     }
 
     /**
@@ -809,5 +833,21 @@ trait QueryBuilder
 
             return $failureResponse;
         }
+    }
+
+    /**
+     * @return ElasticSearchConditionBoolBuilder
+     */
+    public function getConditionBoolBuilder(): ElasticSearchConditionBoolBuilder
+    {
+        return $this->conditionBoolBuilder;
+    }
+
+    /**
+     * @param ElasticSearchConditionBoolBuilder $conditionBoolBuilder
+     */
+    public function setConditionBoolBuilder(ElasticSearchConditionBoolBuilder $conditionBoolBuilder): void
+    {
+        $this->conditionBoolBuilder = $conditionBoolBuilder;
     }
 }
