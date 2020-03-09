@@ -178,15 +178,15 @@ trait QueryBuilder
      */
     public function where(...$params)
     {
-        array_push($params, ConditionDeterminantTypeEnum::MUST);
+        $params = array_merge([ConditionDeterminantTypeEnum::MUST], $params);
         $this->applyDeterminantWhere(...$params);
 
         return $this;
     }
 
-    private function applyDeterminantWhere($field,
-                                           $value = null,
-                                           string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST): void
+    private function applyDeterminantWhere(string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST,
+                                           $field,
+                                           $value = null): void
     {
         if ($field instanceof \Closure) {
             self::applyNestedWhere($field, $conditionDeterminant);
@@ -196,7 +196,7 @@ trait QueryBuilder
 
         $args = func_get_args();
         if (count($args) == 4) {
-            list($field, $operator, $value) = $args;
+            list($conditionDeterminant, $field, $operator, $value) = $args;
         }
         else {
             $operator = '=';
@@ -212,7 +212,7 @@ trait QueryBuilder
      */
     public function whereNot(...$params)
     {
-        array_push($params, ConditionDeterminantTypeEnum::MUST_NOT);
+        $params = array_merge([ConditionDeterminantTypeEnum::MUST_NOT], $params);
         $this->applyDeterminantWhere(...$params);
 
         return $this;
@@ -350,7 +350,7 @@ trait QueryBuilder
 
     public function orWhere(...$params)
     {
-        array_push($params, ConditionDeterminantTypeEnum::SHOULD);
+        $params = array_merge([ConditionDeterminantTypeEnum::SHOULD], $params);
         $this->applyDeterminantWhere(...$params);
 
         return $this;

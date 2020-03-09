@@ -93,6 +93,7 @@ class ElasticSearchConditionBoolBuilder
                     $condition->getSintax() => $condition->buildForRequest()
                 ];
             })
+            ->values()
             ->toArray();
     }
 
@@ -109,6 +110,7 @@ class ElasticSearchConditionBoolBuilder
                     $condition->getSintax() => $condition->buildForRequest()
                 ];
             })
+            ->values()
             ->toArray();
     }
 
@@ -125,6 +127,7 @@ class ElasticSearchConditionBoolBuilder
                     $condition->getSintax() => $condition->buildForRequest()
                 ];
             })
+            ->values()
             ->toArray();
     }
 
