@@ -195,7 +195,7 @@ trait QueryBuilder
         }
 
         $args = func_get_args();
-        if (count($args) == 3) {
+        if (count($args) == 4) {
             list($field, $operator, $value) = $args;
         }
         else {
