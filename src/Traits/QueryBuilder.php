@@ -5,11 +5,16 @@ namespace glodzienski\AWSElasticsearchService\Traits;
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchValueCountAggregation;
 use glodzienski\AWSElasticsearchService\Builders\ElasticSearchConditionBoolBuilder;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchExistsCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchMatchCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchMultiMatchCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchPrefixCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchRangeCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchRegexCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchTermCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchTermsCondition;
 use glodzienski\AWSElasticsearchService\Enumerators\ConditionRangeTypeEnum;
-use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionDeterminantTypeEnum;
+use glodzienski\AWSElasticsearchService\Enumerators\ConditionDeterminantTypeEnum;
 use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
 use GuzzleHttp\Client;
@@ -21,14 +26,6 @@ use Illuminate\Support\Collection;
  */
 trait QueryBuilder
 {
-    /**
-     * @var array
-     */
-    private $wheres = [
-        'must' => [],
-        'must_not' => [],
-        'should' => [],
-    ];
     /**
      * @var array
      */
@@ -114,51 +111,60 @@ trait QueryBuilder
     }
 
     /**
-     * @param $groupRequest
+     * @param string $conditionDeterminant
      * @param $field
      * @param $operator
      * @param $value
      * @throws \ReflectionException
      * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
      */
-    private function applyCommonWhere($groupRequest, $field, $operator, $value): void
+    private function applyCondition(string $conditionDeterminant,
+                                    $field,
+                                    $operator,
+                                    $value): void
     {
         switch ($operator) {
             case '=':
             case '!=':
             case '<>':
-                $this->conditionBoolBuilder->addCondition(new ElasticSearchTermCondition($field, $value, $groupRequest));
+                $this->conditionBoolBuilder->addCondition(new ElasticSearchTermCondition($field, $value, $conditionDeterminant));
                 break;
             case '>':
-                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::GREATER_THAN);
+                $condition = new ElasticSearchRangeCondition($field, $value, $conditionDeterminant, ConditionRangeTypeEnum::GREATER_THAN);
                 $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case '<':
-                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::LESS_THAN);
+                $condition = new ElasticSearchRangeCondition($field, $value, $conditionDeterminant, ConditionRangeTypeEnum::LESS_THAN);
                 $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case '>=':
-                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::GREATER_THAN_OR_EQUAL);
+                $condition = new ElasticSearchRangeCondition($field, $value, $conditionDeterminant, ConditionRangeTypeEnum::GREATER_THAN_OR_EQUAL);
                 $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case '<=':
-                $condition = new ElasticSearchRangeCondition($field, $value, $groupRequest, ConditionRangeTypeEnum::LESS_THAN_OR_EQUAL);
+                $condition = new ElasticSearchRangeCondition($field, $value, $conditionDeterminant, ConditionRangeTypeEnum::LESS_THAN_OR_EQUAL);
                 $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case 'like':
-                $this->conditionBoolBuilder->addCondition(new ElasticSearchMatchCondition($field, $value, $groupRequest));
+                $this->conditionBoolBuilder->addCondition(new ElasticSearchMatchCondition($field, $value, $conditionDeterminant));
                 break;
         }
     }
 
     /**
      * @param \Closure $field
+     * @param string $conditionDeterminant
      */
-    private function applyNestedWhere(\Closure $field): void
+    private function applyNestedWhere(\Closure $field,
+                                      string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST): void
     {
-        $nestedConditionBoolBuilder = new ElasticSearchConditionBoolBuilder();
-
         $currentBool = $this->getConditionBoolBuilder();
+
+        $nestedConditionBoolBuilder = new ElasticSearchConditionBoolBuilder();
+        $nestedConditionBoolBuilder
+            ->setBoolParent($currentBool)
+            ->setBoolDeterminantType($conditionDeterminant);
+
         $currentBool->addNestedBool($nestedConditionBoolBuilder);
 
         $this->setConditionBoolBuilder($nestedConditionBoolBuilder);
@@ -167,37 +173,25 @@ trait QueryBuilder
     }
 
     /**
-     * @param $field
-     * @param $value
+     * @param mixed ...$params
      * @return $this
      */
-    public function where($field, $value = null)
+    public function where(...$params)
     {
-        if ($field instanceof \Closure) {
-            self::applyNestedWhere($field);
-
-            return $this;
-        }
-
-        $args = func_get_args();
-        if (count($args) == 3) {
-            list($field, $operator, $value) = $args;
-        }
-        else {
-            $operator = '=';
-        }
-
-        self::applyCommonWhere(ElasticSearchConditionDeterminantTypeEnum::MUST, $field, $operator, $value);
+        array_push($params, ConditionDeterminantTypeEnum::MUST);
+        $this->applyDeterminantWhere(...$params);
 
         return $this;
     }
 
-    public function teste($field, $value = null)
+    private function applyDeterminantWhere($field,
+                                           $value = null,
+                                           string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST): void
     {
         if ($field instanceof \Closure) {
-            self::applyNestedWhere($field);
+            self::applyNestedWhere($field, $conditionDeterminant);
 
-            return $this;
+            return;
         }
 
         $args = func_get_args();
@@ -208,7 +202,7 @@ trait QueryBuilder
             $operator = '=';
         }
 
-        self::applyCommonWhere(ElasticSearchConditionDeterminantTypeEnum::MUST_NOT, $field, $operator, $value);
+        self::applyCondition($conditionDeterminant, $field, $operator, $value);
     }
 
     /**
@@ -218,7 +212,8 @@ trait QueryBuilder
      */
     public function whereNot(...$params)
     {
-        $this->teste(...$params);
+        array_push($params, ConditionDeterminantTypeEnum::MUST_NOT);
+        $this->applyDeterminantWhere(...$params);
 
         return $this;
     }
@@ -230,11 +225,7 @@ trait QueryBuilder
      */
     public function whereIn($field, array $value)
     {
-        $this->wheres['must'][] = [
-            'terms' => [
-                $field => $value
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchTermsCondition($field, $value, ConditionDeterminantTypeEnum::MUST));
 
         return $this;
     }
@@ -246,11 +237,7 @@ trait QueryBuilder
      */
     public function whereNotIn($field, array $value)
     {
-        $this->wheres['must_not'][] = [
-            'terms' => [
-                $field => $value
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchTermsCondition($field, $value, ConditionDeterminantTypeEnum::MUST_NOT));
 
         return $this;
     }
@@ -262,65 +249,58 @@ trait QueryBuilder
      */
     public function whereMultiMatch(array $fields, string $value)
     {
-        $this->wheres['must'][] = [
-            'multi_match' => [
-                'query' => $value,
-                'fields' => $fields
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchMultiMatchCondition($fields, $value, ConditionDeterminantTypeEnum::MUST));
 
         return $this;
     }
 
     /**
      * @param $field
-     * @param array $value
+     * @param array $values
      * @return $this
+     * @throws \ReflectionException
+     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
      */
-    public function whereBetween($field, array $value)
+    public function whereBetween($field, array $values)
     {
-        $this->wheres['must'][] = [
-            'range' => [
-                $field => [
-                    'gte' => $value[0],
-                    'lte' => $value[1]
-                ]
-            ]
-        ];
+        $condition = new ElasticSearchRangeCondition(
+            $field,
+            $values,
+            ConditionDeterminantTypeEnum::MUST,
+            ConditionRangeTypeEnum::BETWEEN
+        );
+        $this->conditionBoolBuilder->addCondition($condition);
 
         return $this;
     }
 
     /**
      * @param $field
-     * @param array $value
+     * @param array $values
      * @return $this
+     * @throws \ReflectionException
+     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
      */
-    public function whereNotBetween($field, array $value)
+    public function whereNotBetween($field, array $values)
     {
-        $this->wheres['must_not'][] = [
-            'range' => [
-                $field => [
-                    'gte' => $value[0],
-                    'lte' => $value[1]
-                ]
-            ]
-        ];
+        $condition = new ElasticSearchRangeCondition(
+            $field,
+            $values,
+            ConditionDeterminantTypeEnum::MUST_NOT,
+            ConditionRangeTypeEnum::BETWEEN
+        );
+        $this->conditionBoolBuilder->addCondition($condition);
 
         return $this;
     }
 
     /**
-     * @param $field
+     * @param string $field
      * @return $this
      */
-    public function whereExists($field)
+    public function whereExists(string $field)
     {
-        $this->wheres['must'][] = [
-            'exists' => [
-                'field' => $field
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchExistsCondition($field, ConditionDeterminantTypeEnum::MUST));
 
         return $this;
     }
@@ -331,11 +311,7 @@ trait QueryBuilder
      */
     public function whereNotExists($field)
     {
-        $this->wheres['must_not'][] = [
-            'exists' => [
-                'field' => $field
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchExistsCondition($field, ConditionDeterminantTypeEnum::MUST_NOT));
 
         return $this;
     }
@@ -348,14 +324,14 @@ trait QueryBuilder
      */
     public function whereRegexp($field, $value, $flags = 'ALL')
     {
-        $this->wheres['must'][] = [
-            'regexp' => [
-                $field => [
-                    'value' => $value,
-                    'flags' => $flags
-                ]
-            ]
-        ];
+        $condition = new ElasticSearchRegexCondition(
+            $field,
+            $value,
+            $flags,
+            ConditionDeterminantTypeEnum::MUST
+        );
+
+        $this->conditionBoolBuilder->addCondition($condition);
 
         return $this;
     }
@@ -367,30 +343,15 @@ trait QueryBuilder
      */
     public function wherePrefix($field, string $value)
     {
-        $this->wheres['must'][] = [
-            'prefix' => [
-                $field => $value
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchPrefixCondition($field, $value, ConditionDeterminantTypeEnum::MUST));
 
         return $this;
     }
 
-    /**
-     * @param $field
-     * @param $value
-     * @return $this
-     */
-    public function orWhere($field, $value)
+    public function orWhere(...$params)
     {
-        $args = func_get_args();
-        if (count($args) == 3) {
-            list($field, $operator, $value) = $args;
-        } else {
-            $operator = '=';
-        }
-
-        self::applyCommonWhere('should', $field, $operator, $value);
+        array_push($params, ConditionDeterminantTypeEnum::SHOULD);
+        $this->applyDeterminantWhere(...$params);
 
         return $this;
     }
@@ -402,12 +363,7 @@ trait QueryBuilder
      */
     public function orWhereMultiMatch(array $fields, string $value)
     {
-        $this->wheres['should'][] = [
-            'multi_match' => [
-                'query' => $value,
-                'fields' => $fields
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchMultiMatchCondition($fields, $value, ConditionDeterminantTypeEnum::SHOULD));
 
         return $this;
     }
@@ -419,11 +375,7 @@ trait QueryBuilder
      */
     public function orWherePrefix($field, string $value)
     {
-        $this->wheres['should'][] = [
-            'prefix' => [
-                $field => $value
-            ]
-        ];
+        $this->conditionBoolBuilder->addCondition(new ElasticSearchPrefixCondition($field, $value, ConditionDeterminantTypeEnum::SHOULD));
 
         return $this;
     }

@@ -3,7 +3,7 @@
 namespace glodzienski\AWSElasticsearchService\Conditions;
 
 use glodzienski\AWSElasticsearchService\Enumerators\ConditionRangeTypeEnum;
-use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionTypeEnum;
+use glodzienski\AWSElasticsearchService\Enumerators\ConditionTypeEnum;
 use glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException;
 
 /**
@@ -20,26 +20,36 @@ class ElasticSearchRangeCondition extends ElasticSearchCondition
     /**
      * ElasticSearchRangeCondition constructor.
      * @param string $field
-     * @param string $value
+     * @param mixed $value
      * @param string $conditionDeterminantType
      * @param string $rangeType
      * @throws ElasticSearchException
      * @throws \ReflectionException
      */
     public function __construct(string $field,
-                                string $value,
+                                $value,
                                 string $conditionDeterminantType,
                                 string $rangeType)
     {
+        $this->rangeType = $rangeType;
+
         if (!in_array($rangeType, ConditionRangeTypeEnum::all())) {
             throw new ElasticSearchException("Condition range type: {$rangeType} doesn't exists.");
         }
 
-        $this->type = ElasticSearchConditionTypeEnum::RANGE;
+        if ($this->isBetweenRangeType() && !is_array($value)) {
+            throw new ElasticSearchException("When you use the between range type, your value must be an array with two numbers.");
+        }
+
+        $this->type = ConditionTypeEnum::RANGE;
         $this->field = $field;
         $this->value = $value;
         $this->determinantType = $conditionDeterminantType;
-        $this->rangeType = $rangeType;
+    }
+
+    private function isBetweenRangeType(): bool
+    {
+        return $this->rangeType === ConditionRangeTypeEnum::BETWEEN;
     }
 
     /**
@@ -48,19 +58,19 @@ class ElasticSearchRangeCondition extends ElasticSearchCondition
      */
     public function buildForRequest(): array
     {
+        if ($this->isBetweenRangeType()) {
+            return [
+                $this->field => [
+                    ConditionRangeTypeEnum::GREATER_THAN_OR_EQUAL => $this->value[0],
+                    ConditionRangeTypeEnum::LESS_THAN_OR_EQUAL => $this->value[1],
+                ],
+            ];
+        }
+
         return [
             $this->field => [
                 $this->rangeType => $this->value,
             ],
         ];
-    }
-
-    /**
-     * @param array $values
-     * @return mixed
-     */
-    public function treatResponse(array $values)
-    {
-        return $values['value'];
     }
 }

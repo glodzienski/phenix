@@ -2,7 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService\Conditions;
 
-use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionTypeEnum;
+use glodzienski\AWSElasticsearchService\Enumerators\ConditionTypeEnum;
 
 /**
  * Class ElasticSearchMatchCondition
@@ -20,7 +20,7 @@ class ElasticSearchMatchCondition extends ElasticSearchCondition
                                 string $value,
                                 string $conditionDeterminantType)
     {
-        $this->type = ElasticSearchConditionTypeEnum::TERM;
+        $this->type = ConditionTypeEnum::MATCH;
         $this->field = $field;
         $this->value = $value;
         $this->determinantType = $conditionDeterminantType;
@@ -35,14 +35,5 @@ class ElasticSearchMatchCondition extends ElasticSearchCondition
         return [
             $this->field => $this->value,
         ];
-    }
-
-    /**
-     * @param array $values
-     * @return mixed
-     */
-    public function treatResponse(array $values)
-    {
-        return $values['value'];
     }
 }

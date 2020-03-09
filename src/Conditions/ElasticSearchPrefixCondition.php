@@ -5,13 +5,13 @@ namespace glodzienski\AWSElasticsearchService\Conditions;
 use glodzienski\AWSElasticsearchService\Enumerators\ConditionTypeEnum;
 
 /**
- * Class ElasticSearchTermCondition
+ * Class ElasticSearchPrefixCondition
  * @package glodzienski\AWSElasticsearchService\Conditions
  */
-class ElasticSearchTermCondition extends ElasticSearchCondition
+class ElasticSearchPrefixCondition extends ElasticSearchCondition
 {
     /**
-     * ElasticSearchTermCondition constructor.
+     * ElasticSearchPrefixCondition constructor.
      * @param string $field
      * @param string $value
      * @param string $conditionDeterminantType
@@ -20,7 +20,7 @@ class ElasticSearchTermCondition extends ElasticSearchCondition
                                 string $value,
                                 string $conditionDeterminantType)
     {
-        $this->type = ConditionTypeEnum::TERM;
+        $this->type = ConditionTypeEnum::PREFIX;
         $this->field = $field;
         $this->value = $value;
         $this->determinantType = $conditionDeterminantType;

@@ -15,4 +15,5 @@ class ConditionRangeTypeEnum
     public const LESS_THAN = 'lt';
     public const GREATER_THAN_OR_EQUAL = 'gte';
     public const LESS_THAN_OR_EQUAL = 'lte';
+    public const BETWEEN = 'between';
 }

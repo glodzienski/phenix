@@ -5,22 +5,22 @@ namespace glodzienski\AWSElasticsearchService\Conditions;
 use glodzienski\AWSElasticsearchService\Enumerators\ConditionTypeEnum;
 
 /**
- * Class ElasticSearchTermCondition
+ * Class ElasticSearchTermsCondition
  * @package glodzienski\AWSElasticsearchService\Conditions
  */
-class ElasticSearchTermCondition extends ElasticSearchCondition
+class ElasticSearchTermsCondition extends ElasticSearchCondition
 {
     /**
-     * ElasticSearchTermCondition constructor.
+     * ElasticSearchTermsCondition constructor.
      * @param string $field
-     * @param string $value
+     * @param array $value
      * @param string $conditionDeterminantType
      */
     public function __construct(string $field,
-                                string $value,
+                                array $value,
                                 string $conditionDeterminantType)
     {
-        $this->type = ConditionTypeEnum::TERM;
+        $this->type = ConditionTypeEnum::TERMS;
         $this->field = $field;
         $this->value = $value;
         $this->determinantType = $conditionDeterminantType;

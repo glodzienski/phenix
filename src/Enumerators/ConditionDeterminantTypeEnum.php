@@ -5,10 +5,10 @@ namespace glodzienski\AWSElasticsearchService\Enumerators;
 use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
 
 /**
- * Class ElasticSearchConditionDeterminantTypeEnum
+ * Class ConditionDeterminantTypeEnum
  * @package glodzienski\AWSElasticsearchService\Enumerators
  */
-class ElasticSearchConditionDeterminantTypeEnum
+class ConditionDeterminantTypeEnum
 {
     use EnumTricks;
     public const MUST = 'must';

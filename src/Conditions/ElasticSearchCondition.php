@@ -1,9 +1,8 @@
 <?php
 
 namespace glodzienski\AWSElasticsearchService\Conditions;
-
-use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionDeterminantTypeEnum;
-use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchConditionTypeEnum;
+use glodzienski\AWSElasticsearchService\Enumerators\ConditionDeterminantTypeEnum;
+use glodzienski\AWSElasticsearchService\Enumerators\ConditionTypeEnum;
 use Illuminate\Support\Collection;
 
 /**
@@ -23,7 +22,7 @@ abstract class ElasticSearchCondition
     /**
      * @var string
      */
-    public $determinantType = ElasticSearchConditionDeterminantTypeEnum::MUST;
+    public $determinantType = ConditionDeterminantTypeEnum::MUST;
     /**
      * @var string
      */
@@ -35,18 +34,12 @@ abstract class ElasticSearchCondition
     abstract public function buildForRequest(): array;
 
     /**
-     * @param array $values
-     * @return mixed
-     */
-    abstract public function treatResponse(array $values);
-
-    /**
      * @return string
      * @throws \ReflectionException
      */
     public function getSintax(): string
     {
-        $conditionsTypes = ElasticSearchConditionTypeEnum::all();
+        $conditionsTypes = ConditionTypeEnum::all();
 
         return strtolower(array_flip($conditionsTypes)[$this->type]);
     }
