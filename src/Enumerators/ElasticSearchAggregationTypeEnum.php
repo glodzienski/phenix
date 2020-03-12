@@ -21,4 +21,5 @@ class ElasticSearchAggregationTypeEnum
     public const STATS_BUCKET = 6;
     public const COMPOSITE = 7;
     public const BUCKET_SORT = 8;
+    public const CARDINALITY = 9;
 }
