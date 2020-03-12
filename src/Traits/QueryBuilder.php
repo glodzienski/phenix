@@ -146,7 +146,16 @@ trait QueryBuilder
                 $this->conditionBoolBuilder->addCondition($condition);
                 break;
             case 'like':
-                $this->conditionBoolBuilder->addCondition(new ElasticSearchMatchCondition($field, $value, $conditionDeterminant));
+                $condition = new ElasticSearchMatchCondition($field, $value, $conditionDeterminant);
+                $condition->logicalOperator('and');
+
+                $this->conditionBoolBuilder->addCondition($condition);
+                break;
+            case 'inLike':
+                $condition = new ElasticSearchMatchCondition($field, $value, $conditionDeterminant);
+                $condition->logicalOperator('or');
+
+                $this->conditionBoolBuilder->addCondition($condition);
                 break;
         }
     }
@@ -226,6 +235,26 @@ trait QueryBuilder
     public function whereIn($field, array $value)
     {
         $this->conditionBoolBuilder->addCondition(new ElasticSearchTermsCondition($field, $value, ConditionDeterminantTypeEnum::MUST));
+
+        return $this;
+    }
+
+    public function whereInLike(string $field, string $value)
+    {
+        $condition = new ElasticSearchMatchCondition($field, $value, ConditionDeterminantTypeEnum::MUST);
+        $condition->logicalOperator('or');
+
+        $this->conditionBoolBuilder->addCondition($condition);
+
+        return $this;
+    }
+
+    public function whereLike(string $field, string $value)
+    {
+        $condition = new ElasticSearchMatchCondition($field, $value, ConditionDeterminantTypeEnum::MUST);
+        $condition->logicalOperator('and');
+
+        $this->conditionBoolBuilder->addCondition($condition);
 
         return $this;
     }

@@ -11,6 +11,10 @@ use glodzienski\AWSElasticsearchService\Enumerators\ConditionTypeEnum;
 class ElasticSearchMatchCondition extends ElasticSearchCondition
 {
     /**
+     * @var string
+     */
+    private $logicalOperator = 'or';
+    /**
      * ElasticSearchMatchCondition constructor.
      * @param string $field
      * @param string $value
@@ -27,13 +31,27 @@ class ElasticSearchMatchCondition extends ElasticSearchCondition
     }
 
     /**
+     * @param string $operator
+     * @return $this
+     */
+    public function logicalOperator(string $operator)
+    {
+        $this->logicalOperator = $operator;
+
+        return $this;
+    }
+
+    /**
      * @return array
      * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {
         return [
-            $this->field => $this->value,
+            $this->field => [
+                'query' => $this->value,
+                'operator' => $this->logicalOperator,
+            ],
         ];
     }
 }
