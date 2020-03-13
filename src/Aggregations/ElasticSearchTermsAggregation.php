@@ -1,12 +1,9 @@
 <?php
-
 namespace glodzienski\AWSElasticsearchService\Aggregations;
-
 use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
 use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
 use glodzienski\AWSElasticsearchService\Functionalities\SizeFunctionality;
-
 /**
  * Class ElasticSearchTermsAggregation
  * @package glodzienski\AWSElasticsearchService\Aggregations
@@ -14,7 +11,6 @@ use glodzienski\AWSElasticsearchService\Functionalities\SizeFunctionality;
 class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements SizeFunctionalityContract
 {
     use SizeFunctionality;
-
     /**
      * ElasticSearchTermsAggregation constructor.
      * @param string $name
@@ -26,10 +22,8 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
         $this->name = $name;
         $this->value = $value;
         $this->handleSubAggsHimself = true;
-
         return $this;
     }
-
     /**
      * @return array
      * @throws \ReflectionException
@@ -37,16 +31,13 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
     public function buildForRequest(): array
     {
         $payload = ['field' => $this->value];
-
         if (isset($this->size)) {
             $payload['size'] = $this->size;
         }
-
         return [
             $this->getSintaxOfAggregation() => $payload
         ];
     }
-
     /**
      * @param array $values
      * @return array
@@ -54,28 +45,23 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
     public function treatResponse(array $values)
     {
         $treated = [];
-
         $buckets = $values['buckets'];
-
         if (empty($buckets)) {
             return $treated;
         }
-
         foreach ($buckets as $bucket) {
             $bucketTreated = [
                 'key' => $bucket['key'],
                 'count' => $bucket['doc_count']
             ];
-
             if ($this->hasChildren()) {
                 foreach ($this->getChildren() as $aggChild) {
-                    $bucketTreated[$aggChild->name] = ElasticSearchAggregationResponseHandler::treat($aggChild, $bucket[$aggChild->name]);
+                    $aggregationResponse = $bucket[$aggChild->name] ?? [];
+                    $bucketTreated[$aggChild->name] = ElasticSearchAggregationResponseHandler::treat($aggChild, $aggregationResponse);
                 }
             }
-
             $treated[] = $bucketTreated;
         }
-
         return $treated;
     }
 }
