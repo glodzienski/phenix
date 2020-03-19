@@ -45,7 +45,7 @@ trait QueryBuilder
     /**
      * @var string
      */
-    private $type = 'doc';
+    private $type = '_doc';
     /**
      * @var
      */
@@ -62,6 +62,10 @@ trait QueryBuilder
      * @var string
      */
     private $scroll;
+    /**
+     * @var boolean|integer
+     */
+    private $trackTotalHits = true;
 
     /**
      * @param string $index
@@ -193,6 +197,13 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param string $conditionDeterminant
+     * @param $field
+     * @param null $value
+     * @throws \ReflectionException
+     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     */
     private function applyDeterminantWhere(string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST,
                                            $field,
                                            $value = null): void
@@ -239,6 +250,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param string $field
+     * @param string $value
+     * @return $this
+     */
     public function whereInLike(string $field, string $value)
     {
         $condition = new ElasticSearchMatchCondition($field, $value, ConditionDeterminantTypeEnum::MUST);
@@ -249,6 +265,11 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param string $field
+     * @param string $value
+     * @return $this
+     */
     public function whereLike(string $field, string $value)
     {
         $condition = new ElasticSearchMatchCondition($field, $value, ConditionDeterminantTypeEnum::MUST);
@@ -377,6 +398,12 @@ trait QueryBuilder
         return $this;
     }
 
+    /**
+     * @param mixed ...$params
+     * @return $this
+     * @throws \ReflectionException
+     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     */
     public function orWhere(...$params)
     {
         $params = array_merge([ConditionDeterminantTypeEnum::SHOULD], $params);
@@ -560,10 +587,7 @@ trait QueryBuilder
      */
     private function buildParameters()
     {
-        $params = [
-            'body' => []
-        ];
-
+        $params = ['body' => ['track_total_hits' => $this->getTrackTotalHits()]];
         $params['index'] = $this->index;
         $params['type'] = $this->type;
         $params['body']['query']['bool'] = $this->conditionBoolBuilder->buildForRequest();
@@ -625,8 +649,10 @@ trait QueryBuilder
             return new ElasticSearchResponse($items);
         }
 
+        $hits = $response['hits'];
+
         // TODO Develop ElasticSearchSourceResponseHandler
-        $hits = $response['hits']['hits'];
+        $hits = $hits['hits'];
         foreach ($hits as $hit) {
             $items->push(collect($hit['_source']));
         }
@@ -636,9 +662,8 @@ trait QueryBuilder
 
         $elasticSearchResponse = new ElasticSearchResponse($items, collect($aggregations));
 
-        $hits = $response['hits'];
         if (key_exists('total', $hits)) {
-            $elasticSearchResponse->setTotalHits($hits['total']);
+            $elasticSearchResponse->setTotalHits($hits['total']['value'] ?? $hits['total']);
         }
 
         if (key_exists('_scroll_id', $response)) {
@@ -821,5 +846,29 @@ trait QueryBuilder
     public function setConditionBoolBuilder(ElasticSearchConditionBoolBuilder $conditionBoolBuilder): void
     {
         $this->conditionBoolBuilder = $conditionBoolBuilder;
+    }
+
+    /**
+     * @return bool|int
+     */
+    public function getTrackTotalHits()
+    {
+        return $this->trackTotalHits;
+    }
+
+    /**
+     * @param bool|int $trackTotalHits
+     */
+    public function setTrackTotalHits($trackTotalHits): void
+    {
+        $this->trackTotalHits = $trackTotalHits;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
     }
 }
