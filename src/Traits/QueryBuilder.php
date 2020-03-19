@@ -652,8 +652,7 @@ trait QueryBuilder
         $hits = $response['hits'];
 
         // TODO Develop ElasticSearchSourceResponseHandler
-        $hits = $hits['hits'];
-        foreach ($hits as $hit) {
+        foreach ($hits['hits'] as $hit) {
             $items->push(collect($hit['_source']));
         }
 
