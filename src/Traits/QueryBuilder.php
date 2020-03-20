@@ -749,7 +749,7 @@ trait QueryBuilder
         $client = new Client();
         $index = $this->getIndex();
 
-        $response = $client->get("http://" . config('elasticsearch.host') . "/{$index}/_analyze", [
+        $response = $client->get(config('elasticsearch.host') . "/{$index}/_analyze", [
             'json' => [
                 'analyzer' => $name,
                 'text' => $toAnalizy
