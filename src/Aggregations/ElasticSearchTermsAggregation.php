@@ -1,16 +1,22 @@
 <?php
+
 namespace glodzienski\AWSElasticsearchService\Aggregations;
+
 use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
+use glodzienski\AWSElasticsearchService\Contracts\SortFunctionalityContract;
+use glodzienski\AWSElasticsearchService\Functionalities\SortFunctionality;
 use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
 use glodzienski\AWSElasticsearchService\Functionalities\SizeFunctionality;
+
 /**
  * Class ElasticSearchTermsAggregation
  * @package glodzienski\AWSElasticsearchService\Aggregations
  */
-class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements SizeFunctionalityContract
+class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements SizeFunctionalityContract, SortFunctionalityContract
 {
-    use SizeFunctionality;
+    use SizeFunctionality, SortFunctionality;
+
     /**
      * ElasticSearchTermsAggregation constructor.
      * @param string $name
@@ -24,6 +30,7 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
         $this->handleSubAggsHimself = true;
         return $this;
     }
+
     /**
      * @return array
      * @throws \ReflectionException
@@ -34,10 +41,17 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
         if (isset($this->size)) {
             $payload['size'] = $this->size;
         }
+        if ($this->hasSorter()) {
+            $payload['order'] = [
+                $this->sortBy => $this->sortType
+            ];
+        }
+
         return [
             $this->getSintaxOfAggregation() => $payload
         ];
     }
+
     /**
      * @param array $values
      * @return array
