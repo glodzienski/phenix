@@ -14,6 +14,7 @@ class ElasticSearchMatchCondition extends ElasticSearchCondition
      * @var string
      */
     private $logicalOperator = 'or';
+
     /**
      * ElasticSearchMatchCondition constructor.
      * @param string $field

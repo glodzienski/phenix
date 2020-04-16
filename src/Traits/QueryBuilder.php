@@ -7,6 +7,7 @@ use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchValueCountAggr
 use glodzienski\AWSElasticsearchService\Builders\ElasticSearchConditionBoolBuilder;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchExistsCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchMatchCondition;
+use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchMatchPhraseCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchMultiMatchCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchPrefixCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchRangeCondition;
@@ -15,10 +16,12 @@ use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchTermCondition;
 use glodzienski\AWSElasticsearchService\Conditions\ElasticSearchTermsCondition;
 use glodzienski\AWSElasticsearchService\Enumerators\ConditionRangeTypeEnum;
 use glodzienski\AWSElasticsearchService\Enumerators\ConditionDeterminantTypeEnum;
+use glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException;
 use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationResponseHandler;
 use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
+use ReflectionException;
 
 /**
  * Trait QueryBuilder
@@ -119,8 +122,8 @@ trait QueryBuilder
      * @param $field
      * @param $operator
      * @param $value
-     * @throws \ReflectionException
-     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     * @throws ReflectionException
+     * @throws ElasticSearchException
      */
     private function applyCondition(string $conditionDeterminant,
                                     $field,
@@ -188,6 +191,8 @@ trait QueryBuilder
     /**
      * @param mixed ...$params
      * @return $this
+     * @throws ReflectionException
+     * @throws ElasticSearchException
      */
     public function where(...$params)
     {
@@ -201,8 +206,8 @@ trait QueryBuilder
      * @param string $conditionDeterminant
      * @param $field
      * @param null $value
-     * @throws \ReflectionException
-     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     * @throws ReflectionException
+     * @throws ElasticSearchException
      */
     private function applyDeterminantWhere(string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST,
                                            $field,
@@ -226,9 +231,10 @@ trait QueryBuilder
     }
 
     /**
-     * @param $field
-     * @param $value
+     * @param array $params
      * @return $this
+     * @throws ElasticSearchException
+     * @throws ReflectionException
      */
     public function whereNot(...$params)
     {
@@ -308,8 +314,8 @@ trait QueryBuilder
      * @param $field
      * @param array $values
      * @return $this
-     * @throws \ReflectionException
-     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     * @throws ReflectionException
+     * @throws ElasticSearchException
      */
     public function whereBetween($field, array $values)
     {
@@ -328,8 +334,8 @@ trait QueryBuilder
      * @param $field
      * @param array $values
      * @return $this
-     * @throws \ReflectionException
-     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     * @throws ReflectionException
+     * @throws ElasticSearchException
      */
     public function whereNotBetween($field, array $values)
     {
@@ -401,8 +407,8 @@ trait QueryBuilder
     /**
      * @param mixed ...$params
      * @return $this
-     * @throws \ReflectionException
-     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     * @throws ReflectionException
+     * @throws ElasticSearchException
      */
     public function orWhere(...$params)
     {
@@ -432,6 +438,45 @@ trait QueryBuilder
     public function orWherePrefix($field, string $value)
     {
         $this->conditionBoolBuilder->addCondition(new ElasticSearchPrefixCondition($field, $value, ConditionDeterminantTypeEnum::SHOULD));
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @param string|null $analyzer
+     * @return $this
+     */
+    public function whereMatchPhrase(string $field, string $value, string $analyzer = null)
+    {
+        $condition = new ElasticSearchMatchPhraseCondition($field, $value);
+
+        if (isset($analyzer)) {
+            $condition->analyzer($analyzer);
+        }
+
+        $this->conditionBoolBuilder->addCondition($condition);
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @param string|null $analyzer
+     * @return $this
+     */
+    public function orWhereMatchPhrase(string $field, string $value, string $analyzer = null)
+    {
+        $condition = new ElasticSearchMatchPhraseCondition($field, $value);
+        $condition->setDeterminantType(ConditionDeterminantTypeEnum::SHOULD);
+
+        if (isset($analyzer)) {
+            $condition->analyzer($analyzer);
+        }
+
+        $this->conditionBoolBuilder->addCondition($condition);
 
         return $this;
     }
