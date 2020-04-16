@@ -482,6 +482,26 @@ trait QueryBuilder
     }
 
     /**
+     * @param string $field
+     * @param string $value
+     * @param string|null $analyzer
+     * @return $this
+     */
+    public function whereNotMatchPhrase(string $field, string $value, string $analyzer = null)
+    {
+        $condition = new ElasticSearchMatchPhraseCondition($field, $value);
+        $condition->setDeterminantType(ConditionDeterminantTypeEnum::MUST_NOT);
+
+        if (isset($analyzer)) {
+            $condition->analyzer($analyzer);
+        }
+
+        $this->conditionBoolBuilder->addCondition($condition);
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getAggregations(): array
