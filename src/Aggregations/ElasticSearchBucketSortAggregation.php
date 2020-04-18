@@ -5,6 +5,7 @@ namespace glodzienski\AWSElasticsearchService\Aggregations;
 use glodzienski\AWSElasticsearchService\Contracts\OffsetFunctionalityContract;
 use glodzienski\AWSElasticsearchService\Contracts\SizeFunctionalityContract;
 use glodzienski\AWSElasticsearchService\Enumerators\ElasticSearchAggregationTypeEnum;
+use glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException;
 use glodzienski\AWSElasticsearchService\Functionalities\OffsetFunctionality;
 use glodzienski\AWSElasticsearchService\Functionalities\SizeFunctionality;
 
@@ -22,7 +23,7 @@ class ElasticSearchBucketSortAggregation
     /**
      * ElasticSearchBucketSortAggregation constructor.
      * @param string $name
-     * @throws \glodzienski\AWSElasticsearchService\Exceptions\ElasticSearchException
+     * @throws ElasticSearchException
      */
     public function __construct(string $name)
     {
@@ -42,12 +43,22 @@ class ElasticSearchBucketSortAggregation
      */
     public function buildForRequest(): array
     {
+        $aggregationSyntax = [];
+
+        if (!empty($this->value)) {
+            $aggregationSyntax['sort'] = $this->value;
+        }
+
+        if (!empty($this->from)) {
+            $aggregationSyntax['from'] = $this->from;
+        }
+
+        if (!empty($this->size)) {
+            $aggregationSyntax['size'] = $this->size;
+        }
+
         return [
-            $this->getSintaxOfAggregation() => [
-                'sort' => $this->value,
-                'from' => $this->from,
-                'size' => $this->size
-            ]
+            $this->getSintaxOfAggregation() => $aggregationSyntax
         ];
     }
 
