@@ -54,13 +54,17 @@ trait QueryBuilder
      */
     private $ordination;
     /**
-     * @var
+     * @var int
      */
     private $from;
     /**
-     * @var
+     * @var int
      */
     private $size;
+    /**
+     * @var int|null
+     */
+    private $terminateAfter;
     /**
      * @var string
      */
@@ -615,6 +619,17 @@ trait QueryBuilder
     }
 
     /**
+     * @param int $value
+     * @return QueryBuilder
+     */
+    public function terminateAfter(int $value)
+    {
+        $this->terminateAfter = $value;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getColumns(): array
@@ -668,6 +683,9 @@ trait QueryBuilder
         if (isset($this->size)) {
             $params['body']['size'] = (string)$this->getSize();
         }
+        if (isset($this->terminateAfter)) {
+            $params['body']['terminate_after'] = $this->getTerminateAfter();
+        }
         if (isset($this->from)) {
             $params['body']['from'] = $this->getFrom();
         }
@@ -676,6 +694,14 @@ trait QueryBuilder
         }
 
         return $params;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTerminateAfter()
+    {
+        return $this->terminateAfter;
     }
 
     /**
