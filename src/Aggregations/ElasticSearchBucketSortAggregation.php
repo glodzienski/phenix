@@ -58,7 +58,7 @@ class ElasticSearchBucketSortAggregation
         }
 
         return [
-            $this->getSintaxOfAggregation() => $aggregationSyntax
+            $this->getSyntaxOfAggregation() => $aggregationSyntax
         ];
     }
 

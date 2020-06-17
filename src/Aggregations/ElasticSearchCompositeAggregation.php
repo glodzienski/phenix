@@ -34,7 +34,6 @@ class ElasticSearchCompositeAggregation extends ElasticSearchAggregation impleme
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {
@@ -56,7 +55,7 @@ class ElasticSearchCompositeAggregation extends ElasticSearchAggregation impleme
         }
 
         return [
-            $this->getSintaxOfAggregation() => $payload
+            $this->getSyntaxOfAggregation() => $payload
         ];
     }
 

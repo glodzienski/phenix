@@ -2,7 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService\Enumerators;
 
-use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
+use Logcomex\PhpUtils\Helpers\EnumHelper;
 
 /**
  * Class ElasticSearchSortTypeEnum
@@ -10,7 +10,7 @@ use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
  */
 class ElasticSearchSortTypeEnum
 {
-    use EnumTricks;
+    use EnumHelper;
     public const ASC = 0;
     public const DESC = 1;
 }

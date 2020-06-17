@@ -2,7 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService\Enumerators;
 
-use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
+use Logcomex\PhpUtils\Helpers\EnumHelper;
 
 /**
  * Class ElasticSearchAggregationTypeEnum
@@ -10,7 +10,7 @@ use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
  */
 class ElasticSearchAggregationTypeEnum
 {
-    use EnumTricks;
+    use EnumHelper;
 
     public const MIN = 0;
     public const AVG = 1;

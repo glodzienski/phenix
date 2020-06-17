@@ -21,7 +21,6 @@ use glodzienski\AWSElasticsearchService\Handlers\ElasticSearchAggregationRespons
 use glodzienski\AWSElasticsearchService\ElasticSearchResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
-use ReflectionException;
 
 /**
  * Trait QueryBuilder
@@ -126,7 +125,6 @@ trait QueryBuilder
      * @param $field
      * @param $operator
      * @param $value
-     * @throws ReflectionException
      * @throws ElasticSearchException
      */
     private function applyCondition(string $conditionDeterminant,

@@ -126,9 +126,8 @@ abstract class ElasticSearchAggregation
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
-    public function getSintaxOfAggregation(): string
+    public function getSyntaxOfAggregation(): string
     {
         $aggregationsTypes = ElasticSearchAggregationTypeEnum::all();
 

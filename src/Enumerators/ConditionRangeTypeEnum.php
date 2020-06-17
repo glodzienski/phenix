@@ -2,7 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService\Enumerators;
 
-use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
+use Logcomex\PhpUtils\Helpers\EnumHelper;
 
 /**
  * Class ConditionRangeTypeEnum
@@ -10,7 +10,7 @@ use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
  */
 class ConditionRangeTypeEnum
 {
-    use EnumTricks;
+    use EnumHelper;
     public const GREATER_THAN = 'gt';
     public const LESS_THAN = 'lt';
     public const GREATER_THAN_OR_EQUAL = 'gte';

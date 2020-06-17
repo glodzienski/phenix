@@ -9,7 +9,8 @@
         "aws/aws-sdk-php": "~3.0",
         "elasticsearch/elasticsearch": "~7.0",
         "nesbot/carbon": "^2.29.1",
-        "guzzlehttp/guzzle": "~6.5"
+        "guzzlehttp/guzzle": "~6.5",
+        "logcomex/php-utils": "dev-master"
     },
     "license": "MIT",
     "authors": [

@@ -2,7 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService\Enumerators;
 
-use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
+use Logcomex\PhpUtils\Helpers\EnumHelper;
 
 /**
  * Class ConditionDeterminantTypeEnum
@@ -10,7 +10,7 @@ use glodzienski\AWSElasticsearchService\Helpers\EnumTricks;
  */
 class ConditionDeterminantTypeEnum
 {
-    use EnumTricks;
+    use EnumHelper;
     public const MUST = 'must';
     public const MUST_NOT = 'must_not';
     public const SHOULD = 'should';

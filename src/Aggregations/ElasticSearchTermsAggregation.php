@@ -33,7 +33,6 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {
@@ -48,7 +47,7 @@ class ElasticSearchTermsAggregation extends ElasticSearchAggregation implements 
         }
 
         return [
-            $this->getSintaxOfAggregation() => $payload
+            $this->getSyntaxOfAggregation() => $payload
         ];
     }
 

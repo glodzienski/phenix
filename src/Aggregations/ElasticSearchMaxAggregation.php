@@ -24,12 +24,11 @@ class ElasticSearchMaxAggregation extends ElasticSearchAggregation
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {
         return [
-            $this->getSintaxOfAggregation() => [
+            $this->getSyntaxOfAggregation() => [
                 'field' => $this->value
             ]
         ];

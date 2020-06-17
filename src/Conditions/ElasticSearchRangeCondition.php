@@ -24,7 +24,6 @@ class ElasticSearchRangeCondition extends ElasticSearchCondition
      * @param string $conditionDeterminantType
      * @param string $rangeType
      * @throws ElasticSearchException
-     * @throws \ReflectionException
      */
     public function __construct(string $field,
                                 $value,
@@ -54,7 +53,6 @@ class ElasticSearchRangeCondition extends ElasticSearchCondition
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {
