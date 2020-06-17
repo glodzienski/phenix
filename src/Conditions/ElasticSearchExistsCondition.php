@@ -25,7 +25,6 @@ class ElasticSearchExistsCondition extends ElasticSearchCondition
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {

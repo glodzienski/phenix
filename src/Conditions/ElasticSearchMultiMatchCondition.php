@@ -28,7 +28,6 @@ class ElasticSearchMultiMatchCondition extends ElasticSearchCondition
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {

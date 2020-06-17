@@ -26,7 +26,6 @@ class ElasticSearchCardinalityAggregation extends ElasticSearchAggregation
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {

@@ -35,7 +35,6 @@ abstract class ElasticSearchCondition
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     public function getSintax(): string
     {

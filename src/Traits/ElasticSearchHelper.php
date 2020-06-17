@@ -6,6 +6,8 @@ use Exception;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use ReflectionException;
+use ReflectionMethod;
 
 /**
  * Trait ElasticSearchHelper
@@ -378,55 +380,55 @@ trait ElasticSearchHelper
      * @param string $method
      * @param array|null $args
      * @return mixed
-     * @throws \ReflectionException
      */
     public function __call($method, $args)
     {
         if (method_exists($this, $method)) {
-            $reflection_method = new \ReflectionMethod($this, $method);
+            try {
+                $reflection_method = new ReflectionMethod($this, $method);
+                foreach ($reflection_method->getParameters() as $param) {
+                    $position = $param->getPosition();
 
-            foreach ($reflection_method->getParameters() as $param) {
-                $position = $param->getPosition();
-
-                if (isset($args[$position])) {
-                    continue;
-                }
-
-                if (!$param->isDefaultValueAvailable()) {
-                    switch ($param->name) {
-                        case 'type':
-                            $arg_value = $this->defaultType();
-                            break;
-
-                        case 'index':
-                            $arg_value = $this->defaultIndex();
-                            break;
-
-                        case 'settings':
-                            $arg_value = $this->config['settings'];
-                            break;
-
-                        case 'mappings':
-                            $arg_value = $this->config['mappings'];
-                            break;
-
-                        default:
-                            $arg_value = null;
-                            break;
+                    if (isset($args[$position])) {
+                        continue;
                     }
-                } else {
-                    $arg_value = $param->getDefaultValue();
-                }
 
-                $args[$position] = $arg_value;
+                    if (!$param->isDefaultValueAvailable()) {
+                        switch ($param->name) {
+                            case 'type':
+                                $arg_value = $this->defaultType();
+                                break;
+
+                            case 'index':
+                                $arg_value = $this->defaultIndex();
+                                break;
+
+                            case 'settings':
+                                $arg_value = $this->config['settings'];
+                                break;
+
+                            case 'mappings':
+                                $arg_value = $this->config['mappings'];
+                                break;
+
+                            default:
+                                $arg_value = null;
+                                break;
+                        }
+                    } else {
+                        $arg_value = $param->getDefaultValue();
+                    }
+
+                    $args[$position] = $arg_value;
+                }
+            } catch (ReflectionException $e) {
+
             }
 
             return call_user_func_array([$this, $method], $args);
-
         } elseif (method_exists($this->client, $method)) {
 
             return call_user_func_array([$this->client, $method], $args);
-
         }
     }
 }

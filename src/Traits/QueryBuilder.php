@@ -2,6 +2,7 @@
 
 namespace glodzienski\AWSElasticsearchService\Traits;
 
+use Closure;
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchAggregation;
 use glodzienski\AWSElasticsearchService\Aggregations\ElasticSearchValueCountAggregation;
 use glodzienski\AWSElasticsearchService\Builders\ElasticSearchConditionBoolBuilder;
@@ -170,10 +171,10 @@ trait QueryBuilder
     }
 
     /**
-     * @param \Closure $field
+     * @param Closure $field
      * @param string $conditionDeterminant
      */
-    private function applyNestedWhere(\Closure $field,
+    private function applyNestedWhere(Closure $field,
                                       string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST): void
     {
         $currentBool = $this->getConditionBoolBuilder();
@@ -193,7 +194,6 @@ trait QueryBuilder
     /**
      * @param mixed ...$params
      * @return $this
-     * @throws ReflectionException
      * @throws ElasticSearchException
      */
     public function where(...$params)
@@ -208,14 +208,13 @@ trait QueryBuilder
      * @param string $conditionDeterminant
      * @param $field
      * @param null $value
-     * @throws ReflectionException
      * @throws ElasticSearchException
      */
     private function applyDeterminantWhere(string $conditionDeterminant = ConditionDeterminantTypeEnum::MUST,
                                            $field,
                                            $value = null): void
     {
-        if ($field instanceof \Closure) {
+        if ($field instanceof Closure) {
             self::applyNestedWhere($field, $conditionDeterminant);
 
             return;
@@ -236,7 +235,6 @@ trait QueryBuilder
      * @param array $params
      * @return $this
      * @throws ElasticSearchException
-     * @throws ReflectionException
      */
     public function whereNot(...$params)
     {
@@ -316,7 +314,6 @@ trait QueryBuilder
      * @param $field
      * @param array $values
      * @return $this
-     * @throws ReflectionException
      * @throws ElasticSearchException
      */
     public function whereBetween($field, array $values)
@@ -336,7 +333,6 @@ trait QueryBuilder
      * @param $field
      * @param array $values
      * @return $this
-     * @throws ReflectionException
      * @throws ElasticSearchException
      */
     public function whereNotBetween($field, array $values)
@@ -409,7 +405,6 @@ trait QueryBuilder
     /**
      * @param mixed ...$params
      * @return $this
-     * @throws ReflectionException
      * @throws ElasticSearchException
      */
     public function orWhere(...$params)

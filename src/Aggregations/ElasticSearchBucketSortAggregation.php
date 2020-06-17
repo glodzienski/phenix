@@ -39,7 +39,6 @@ class ElasticSearchBucketSortAggregation
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function buildForRequest(): array
     {
